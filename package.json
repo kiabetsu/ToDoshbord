@@ -3,12 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@reduxjs/toolkit": "^2.2.7",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "carbon-components": "^11.66.1",
+    "carbon-components-react": "^8.67.1",
+    "carbon-icons": "^7.0.7",
+    "framer-motion": "^11.11.9",
+    "lucide-react": "^0.418.0",
     "react": "^18.3.1",
+    "react-datepicker": "^7.4.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.3.1",
+    "react-dropzone": "^14.2.9",
+    "react-redux": "^9.1.2",
     "react-scripts": "5.0.1",
+    "sass": "^1.77.8",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -34,5 +46,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "webpack": "^5.93.0"
   }
 }

@@ -1,0 +1,78 @@
+.backGround{
+  background-color: rgba(0, 0, 0, 0.2);
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.modal {
+  position: relative;
+  width: 1012px;
+  min-height: 500px;
+  background: #F9F6F3;
+  z-index: 10;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.3);
+  // padding: 10px;
+  text-align: start;
+  // gap: 1em 1em;
+
+  .taskField{
+    object-fit: cover;
+    position: relative;
+
+    img{
+      width: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+    }
+  }
+
+  .content{
+    display: flex;
+   flex-direction: column;
+    background-color: #F9F6F3;
+    position: absolute;
+    top: 200px;
+    padding: 10px;
+    border-radius: 16px;
+    gap: 1em ;
+    box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.3);
+  overflow: scroll;
+  max-height: 600px;
+
+  }
+
+  .exit{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 100;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+
+    &:hover{
+      cursor: pointer;
+      background-color: #eee;
+      border-radius: 21px;
+      opacity: 0.6;
+    }
+
+  }
+} 
+
