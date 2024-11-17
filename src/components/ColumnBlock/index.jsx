@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useDrop } from 'react-dnd';
+import { SortableContext } from '@dnd-kit/sortable';
 
 import styles from './style.module.scss';
 import { TaskBlock } from '../TaskBlock';
@@ -12,26 +12,13 @@ export const ColumnBlock = ({ title, status }) => {
 
   const dispatch = useDispatch();
 
-  console.log('barbariki', title, tasks);
-
   const changeStatus = (id, status) => {
     const data = { id: id, status: status };
     dispatch(setStatus(data));
   };
 
-  const [{ isOver }, drop] = useDrop(
-    () => ({
-      accept: 'task',
-      drop: (item) => changeStatus(item.id, status),
-      collect: (monitor) => ({
-        isOver: !!monitor.isOver(),
-      }),
-    }),
-    [status],
-  );
-
   return (
-    <div ref={drop} className={styles.column} style={{}}>
+    <div className={styles.column} style={{}}>
       <div className={styles.columnTitle}>
         <h2>{title}</h2>
       </div>
@@ -40,6 +27,17 @@ export const ColumnBlock = ({ title, status }) => {
           <TaskBlock key={obj.id} {...obj} />
         ))}
       </div>
+    </div>
+  );
+};
+
+export const ColumnBlockRefactor = ({ statusTitle, children }) => {
+  return (
+    <div className={styles.column}>
+      <div className={styles.columnTitle}>
+        <h2>{statusTitle}</h2>
+      </div>
+      {children}
     </div>
   );
 };

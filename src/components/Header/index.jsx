@@ -1,9 +1,14 @@
 import React from 'react';
 import styles from './style.module.scss';
-import { Columns3, ListFilter, ChevronDown } from 'lucide-react';
+import { Columns3, ChevronDown } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+
 import ava from '../../asset/Profile 01.png';
+import { setModal } from '../../redux/taskSlice';
+import { Filter } from '../Filter';
 
 export const Header = () => {
+  const dispatch = useDispatch();
   return (
     <div className={styles.header}>
       <div className={styles.headerField}>
@@ -30,15 +35,19 @@ export const Header = () => {
           </ul>
         </div> */}
             </div>
-            <div className={styles.create}>
+            <div
+              className={styles.create}
+              onClick={(e) => {
+                e.stopPropagation();
+                dispatch(setModal({ isOpen: true, isCreating: true }));
+              }}>
               <span>Create</span>
             </div>
           </div>
         </div>
         <div className={styles.rightSide}>
-          <div className={styles.filter}>
-            <ListFilter size={20} />
-          </div>
+          <Filter />
+
           <div className={styles.profile}>
             <img src={ava} alt="Profile " />
           </div>

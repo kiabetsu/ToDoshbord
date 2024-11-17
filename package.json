@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@dnd-kit/core": "^6.1.0",
+    "@dnd-kit/sortable": "^8.0.0",
     "@reduxjs/toolkit": "^2.2.7",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -11,6 +13,7 @@
     "carbon-components-react": "^8.67.1",
     "carbon-icons": "^7.0.7",
     "framer-motion": "^11.11.9",
+    "immutability-helper": "^3.1.1",
     "lucide-react": "^0.418.0",
     "react": "^18.3.1",
     "react-datepicker": "^7.4.0",

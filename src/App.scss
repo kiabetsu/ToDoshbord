@@ -1,14 +1,13 @@
-
 .App {
   text-align: center;
   display: flex;
   /* justify-content: center; */
   align-items: center;
   min-height: 77vh;
-  background-color: #F9F6F3;
+  background-color: #f9f6f3;
   min-height: 100vh;
   flex-direction: column;
-  width: 100%;
+  width: auto;
   padding: 0;
   margin: 0;
 }
@@ -35,7 +34,6 @@
   color: white;
 }
 
-
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -45,19 +43,17 @@
   }
 }
 
-
-.main{
+.main {
   display: flex;
   justify-content: center;
   flex-direction: column;
 
-  >.content{
+  > .content {
     display: flex;
     gap: 20px;
   }
 
-  >h2{
+  > h2 {
     text-align: start;
   }
-  
 }
