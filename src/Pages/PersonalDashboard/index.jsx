@@ -26,11 +26,14 @@ import { TaskBlock } from '../../components/TaskBlock';
 import { setOrderIndex } from '../../redux/taskSlice';
 
 export const PersonalDashboard = () => {
-  const { statuses, modal, tasks } = useSelector((state) => state.tasks);
+  const { statuses, modal, tasks, filteredTasks } = useSelector((state) => state.tasks);
   // eslint-disable-next-line no-undef
   const dispatch = useDispatch();
 
-  const tasksIds = tasks.map((obj) => obj.id);
+  console.log('filteredTasks', filteredTasks);
+
+  const tasksIds =
+    tasks === filteredTasks ? tasks.map((obj) => obj.id) : filteredTasks.map((obj) => obj.id);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 10 } }),
@@ -114,7 +117,7 @@ export const PersonalDashboard = () => {
               <ColumnBlockRefactor key={i} statusTitle={statusTitle}>
                 <div className={styles.tasksList}>
                   <SortableContext items={tasksIds}>
-                    {tasks
+                    {filteredTasks
                       .filter((task) => task.status === i)
                       .sort((a, b) => a.order_index - b.order_index)
                       .map((obj) => (

@@ -36,6 +36,7 @@ const initialState = {
   statuses: ['To Do', 'In Progress', 'Done'],
   modal: { isOpen: false, id: null, isCreating: false },
   idDraggingComponent: false,
+  filteredTasks: data,
 };
 
 export const taskSlice = createSlice({
@@ -85,11 +86,17 @@ export const taskSlice = createSlice({
       state.tasks = state.tasks.filter((task) => task.id !== action.payload.id);
     },
 
-    setTasksFilter: (state, action) => {},
-
-    setDueDate: (state, action) => {
-      const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
-      state.tasks[id].due_date.date = action.payload.value;
+    setTasksFilter: (state, action) => {
+      console.log(
+        'filter value',
+        state.tasks[0].summery.toLowerCase().includes(action.payload.filter.toLowerCase()),
+      );
+      state.filteredTasks = state.tasks.filter(
+        (task) =>
+          task.summery.toLowerCase().includes(action.payload.filter.toLowerCase()) ||
+          task.description.toLowerCase().includes(action.payload.filter.toLowerCase()),
+      );
+      // console.log('FILTERED TASKS', state.filteredTasks);
     },
 
     setDataTextContent: (state, action) => {
@@ -146,35 +153,35 @@ export const taskSlice = createSlice({
       state.idDraggingComponent = action.payload;
     },
 
-    setUploadAttachment: (state, action) => {
-      const getDate = (date) => {
-        return `${date.getDate(date)}.${date.getMonth(date) + 1}.${date.getFullYear(
-          date,
-        )} ${date.getHours(date)}:${date.getMinutes(date)}`;
-      };
+    // setUploadAttachment: (state, action) => {
+    //   const getDate = (date) => {
+    //     return `${date.getDate(date)}.${date.getMonth(date) + 1}.${date.getFullYear(
+    //       date,
+    //     )} ${date.getHours(date)}:${date.getMinutes(date)}`;
+    //   };
 
-      const newFile = action.payload.acceptedFiles[0];
-      newFile['uploadTime'] = { dateFormat: Date(Date.now()), stringFormat: getDate(new Date()) };
-      const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
-      const fileList = state.tasks[id].attachments;
-      newFile['id'] = fileList.length > 0 ? fileList.at(-1).id + 1 : 0;
-      const file = new FileReader();
-      file.readAsDataURL(action.payload.acceptedFiles[0]);
-      file.onload = function () {
-        newFile['preview'] = file.result;
-        if (newFile) {
-          const updatedList = [...fileList, newFile];
-          state.tasks[id].attachments = updatedList;
-        }
-      };
-    },
+    //   const newFile = action.payload.acceptedFiles[0];
+    //   newFile['uploadTime'] = { dateFormat: Date(Date.now()), stringFormat: getDate(new Date()) };
+    //   const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
+    //   const fileList = state.tasks[id].attachments;
+    //   newFile['id'] = fileList.length > 0 ? fileList.at(-1).id + 1 : 0;
+    //   const file = new FileReader();
+    //   file.readAsDataURL(action.payload.acceptedFiles[0]);
+    //   file.onload = function () {
+    //     newFile['preview'] = file.result;
+    //     if (newFile) {
+    //       const updatedList = [...fileList, newFile];
+    //       state.tasks[id].attachments = updatedList;
+    //     }
+    //   };
+    // },
 
-    setRemoveAttachment: (state, action) => {
-      const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
-      state.tasks[id].attachments = state.tasks[id].attachments.filter((file) => {
-        return file.id !== action.payload.item.id;
-      });
-    },
+    // setRemoveAttachment: (state, action) => {
+    //   const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
+    //   state.tasks[id].attachments = state.tasks[id].attachments.filter((file) => {
+    //     return file.id !== action.payload.item.id;
+    //   });
+    // },
   },
 });
 
@@ -190,6 +197,7 @@ export const {
   setRemoveAttachment,
   createTask,
   setRemoveTask,
+  setTasksFilter,
 } = taskSlice.actions;
 
 export default taskSlice.reducer;
