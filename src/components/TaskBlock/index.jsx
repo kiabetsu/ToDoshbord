@@ -66,9 +66,7 @@ export const TaskBlock = ({
       onClick={(e) => {
         openModalWindow(e);
       }}>
-      <div className={styles.img}>
-        <img src={image} alt="Picture" />
-      </div>
+      <div className={styles.img}>{image ? <img src={image} alt="Picture" /> : null}</div>
       <div className={styles.title}>
         <div className={styles.taskTitle}>
           <h4>{summery}</h4>

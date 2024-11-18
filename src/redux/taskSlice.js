@@ -79,6 +79,7 @@ export const taskSlice = createSlice({
       newTask['description'] = action.payload.description;
       newTask['due_date'] = formatDate(action.payload.due_date);
       newTask['attachments'] = action.payload.attachments;
+
       state.tasks.push(newTask);
     },
 
@@ -87,16 +88,11 @@ export const taskSlice = createSlice({
     },
 
     setTasksFilter: (state, action) => {
-      console.log(
-        'filter value',
-        state.tasks[0].summery.toLowerCase().includes(action.payload.filter.toLowerCase()),
-      );
       state.filteredTasks = state.tasks.filter(
         (task) =>
           task.summery.toLowerCase().includes(action.payload.filter.toLowerCase()) ||
           task.description.toLowerCase().includes(action.payload.filter.toLowerCase()),
       );
-      // console.log('FILTERED TASKS', state.filteredTasks);
     },
 
     setDataTextContent: (state, action) => {

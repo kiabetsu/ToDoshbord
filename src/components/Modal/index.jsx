@@ -30,6 +30,8 @@ export const Modal = ({ id }) => {
 
   const data = tasks.find((task) => task.id === id);
 
+  console.log('data', data);
+
   const today = new Date();
   const currentDate =
     today.getFullYear() +
@@ -43,6 +45,7 @@ export const Modal = ({ id }) => {
   const [editedDescription, setEditedDescription] = React.useState(data && data.description);
   const [editedDueDate, setEditedDueDate] = React.useState(data ? data.due_date.date : currentDate);
   const [editedAttachments, setEditedAttachments] = React.useState(data ? data.attachments : []);
+  console.log('editedSummery', editedSummery);
 
   const modalRef = React.useRef();
 
@@ -62,8 +65,6 @@ export const Modal = ({ id }) => {
       document.removeEventListener('click', handleClick);
     };
   });
-
-  const [startDate, setStartDate] = React.useState(data ? data.due_date.date : null);
 
   const onCreateTask = (summery, description, due_date, attachments, pic) => {
     dispatch(
@@ -170,11 +171,13 @@ export const Modal = ({ id }) => {
                   className={styles.summery}
                   contentEditable={true}
                   suppressContentEditableWarning={true}
+                  value={editedSummery}
                   onInput={(e) => {
                     console.log(e.currentTarget.textContent);
                     setEditedSummery(e.currentTarget.textContent);
                   }}>
-                  <span className={styles.contentText} value={editedSummery} />
+                  <span className={styles.contentText} value={editedSummery}></span>
+                  {/* <div>{editedSummery}</div> */}
                 </div>
               </div>
             </div>

@@ -30,8 +30,6 @@ export const PersonalDashboard = () => {
   // eslint-disable-next-line no-undef
   const dispatch = useDispatch();
 
-  console.log('filteredTasks', filteredTasks);
-
   const tasksIds =
     tasks === filteredTasks ? tasks.map((obj) => obj.id) : filteredTasks.map((obj) => obj.id);
 
