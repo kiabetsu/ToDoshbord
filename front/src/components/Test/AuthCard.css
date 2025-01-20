@@ -1,0 +1,21 @@
+.auth-container {
+  position: relative;
+  width: 300px; /* Ширина карточки */
+  height: 100px;
+
+  overflow: hidden;
+}
+
+.card {
+  position: absolute;
+  width: 100%;
+  transition: transform 0.5s ease;
+}
+
+.login {
+  transform: translateX(0);
+}
+
+.register {
+  transform: translateX(100%);
+}
