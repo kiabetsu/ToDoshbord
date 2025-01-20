@@ -30,6 +30,8 @@ export const Modal = ({ id }) => {
 
   const data = modal.isOpen && tasks.find((task) => task.id === modal.id);
 
+  console.log('data', data);
+
   const today = new Date();
   const currentDate =
     today.getFullYear() +
@@ -43,6 +45,7 @@ export const Modal = ({ id }) => {
   const [editedDescription, setEditedDescription] = React.useState(data && data.description);
   const [editedDueDate, setEditedDueDate] = React.useState(data ? data.due_date.date : currentDate);
   const [editedAttachments, setEditedAttachments] = React.useState(data ? data.attachments : []);
+  console.log('editedSummery', editedSummery);
 
   React.useEffect(() => {
     setEditedPic(data ? data.image : null);
@@ -71,9 +74,13 @@ export const Modal = ({ id }) => {
     };
   });
 
+<<<<<<< HEAD:front/src/components/Modal/index.jsx
   const [startDate, setStartDate] = React.useState(data ? data.due_date.date : null);
 
   const onCreateTask = (summary, description, due_date, attachments, pic) => {
+=======
+  const onCreateTask = (summery, description, due_date, attachments, pic) => {
+>>>>>>> main:src/components/Modal/index.jsx
     dispatch(
       createTask({
         summary: summary,
@@ -187,10 +194,16 @@ export const Modal = ({ id }) => {
                   className={styles.summary}
                   contentEditable={true}
                   suppressContentEditableWarning={true}
+                  value={editedSummery}
                   onInput={(e) => {
                     setEditedSummary(e.currentTarget.textContent);
                   }}>
+<<<<<<< HEAD:front/src/components/Modal/index.jsx
                   <span className={styles.contentText} value={editedSummary} />
+=======
+                  <span className={styles.contentText} value={editedSummery}></span>
+                  {/* <div>{editedSummery}</div> */}
+>>>>>>> main:src/components/Modal/index.jsx
                 </div>
               </div>
             </div>

@@ -92,6 +92,7 @@ export const taskSlice = createSlice({
       newTask['description'] = action.payload.description;
       newTask['due_date'] = formatDate(action.payload.due_date);
       newTask['attachments'] = action.payload.attachments;
+
       state.tasks.push(newTask);
     },
 
@@ -102,6 +103,7 @@ export const taskSlice = createSlice({
     setTasksFilter: (state, action) => {
       state.filteredTasks = state.tasks.filter(
         (task) =>
+<<<<<<< HEAD:front/src/redux/taskSlice.js
           task.summary.toLowerCase().includes(action.payload.filter.toLowerCase()) ||
           task.description.toLowerCase().includes(action.payload.filter.toLowerCase()),
       );
@@ -110,6 +112,11 @@ export const taskSlice = createSlice({
     setDueDate: (state, action) => {
       const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
       state.tasks[id].due_date.date = action.payload.value;
+=======
+          task.summery.toLowerCase().includes(action.payload.filter.toLowerCase()) ||
+          task.description.toLowerCase().includes(action.payload.filter.toLowerCase()),
+      );
+>>>>>>> main:src/redux/taskSlice.js
     },
 
     setDataTextContent: (state, action) => {
@@ -164,35 +171,35 @@ export const taskSlice = createSlice({
       state.idDraggingComponent = action.payload;
     },
 
-    setUploadAttachment: (state, action) => {
-      const getDate = (date) => {
-        return `${date.getDate(date)}.${date.getMonth(date) + 1}.${date.getFullYear(
-          date,
-        )} ${date.getHours(date)}:${date.getMinutes(date)}`;
-      };
+    // setUploadAttachment: (state, action) => {
+    //   const getDate = (date) => {
+    //     return `${date.getDate(date)}.${date.getMonth(date) + 1}.${date.getFullYear(
+    //       date,
+    //     )} ${date.getHours(date)}:${date.getMinutes(date)}`;
+    //   };
 
-      const newFile = action.payload.acceptedFiles[0];
-      newFile['uploadTime'] = { dateFormat: Date(Date.now()), stringFormat: getDate(new Date()) };
-      const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
-      const fileList = state.tasks[id].attachments;
-      newFile['id'] = fileList.length > 0 ? fileList.at(-1).id + 1 : 0;
-      const file = new FileReader();
-      file.readAsDataURL(action.payload.acceptedFiles[0]);
-      file.onload = function () {
-        newFile['preview'] = file.result;
-        if (newFile) {
-          const updatedList = [...fileList, newFile];
-          state.tasks[id].attachments = updatedList;
-        }
-      };
-    },
+    //   const newFile = action.payload.acceptedFiles[0];
+    //   newFile['uploadTime'] = { dateFormat: Date(Date.now()), stringFormat: getDate(new Date()) };
+    //   const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
+    //   const fileList = state.tasks[id].attachments;
+    //   newFile['id'] = fileList.length > 0 ? fileList.at(-1).id + 1 : 0;
+    //   const file = new FileReader();
+    //   file.readAsDataURL(action.payload.acceptedFiles[0]);
+    //   file.onload = function () {
+    //     newFile['preview'] = file.result;
+    //     if (newFile) {
+    //       const updatedList = [...fileList, newFile];
+    //       state.tasks[id].attachments = updatedList;
+    //     }
+    //   };
+    // },
 
-    setRemoveAttachment: (state, action) => {
-      const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
-      state.tasks[id].attachments = state.tasks[id].attachments.filter((file) => {
-        return file.id !== action.payload.item.id;
-      });
-    },
+    // setRemoveAttachment: (state, action) => {
+    //   const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
+    //   state.tasks[id].attachments = state.tasks[id].attachments.filter((file) => {
+    //     return file.id !== action.payload.item.id;
+    //   });
+    // },
   },
 });
 
