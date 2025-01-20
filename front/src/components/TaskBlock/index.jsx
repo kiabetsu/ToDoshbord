@@ -68,11 +68,7 @@ export const TaskBlock = ({
       onClick={(e) => {
         openModalWindow(e);
       }}>
-<<<<<<< HEAD:front/src/components/TaskBlock/index.jsx
       <div className={styles.img}>{image && <img src={image} alt="Picture" />}</div>
-=======
-      <div className={styles.img}>{image ? <img src={image} alt="Picture" /> : null}</div>
->>>>>>> main:src/components/TaskBlock/index.jsx
       <div className={styles.title}>
         <div className={styles.taskTitle}>
           <h4>{summary}</h4>

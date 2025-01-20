@@ -203,12 +203,10 @@ export const TaskModal = () => {
           <TaskModalField icon={<AlignLeft />} name="Description">
             <TextareaAutosize
               className={styles.textarea}
-              // ref={editableDescriptionRef}
               onChange={(e) => setEditedDescription(e.target.value)}
               value={editedDescription}
               placeholder="Enter a description for your task..."
               minRows={3}
-              // maxRows={10}
             />
           </TaskModalField>
           <TaskModalField icon={<CalendarDays />} name="Due date">
@@ -218,13 +216,6 @@ export const TaskModal = () => {
               value={editedDueDate === null ? currentDate : editedDueDate}
               onChange={(e) => setEditedDueDate(e.target.value)}
             />
-            {/* <DatePicker
-              onChange={setEditedDueDate}
-              value={currentDate}
-              format="dd.MM.yyyy"
-              clearIcon={null}
-              calendarIcon={null}
-            /> */}
           </TaskModalField>
           <TaskModalField icon={<Paperclip />} name="Attachments">
             <DropFileInput fileList={editedAttachments} setFileList={setEditedAttachments} />
