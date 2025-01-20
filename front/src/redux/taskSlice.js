@@ -54,7 +54,7 @@ export const taskSlice = createSlice({
     setAlert: (state, action) => {
       state.alert.isOpen = action.payload.isOpen;
 
-      setTimeout((state.alert.event = action.payload.event), 500);
+      state.alert.event = action.payload.event;
     },
 
     setLogin(state, action) {
@@ -103,20 +103,9 @@ export const taskSlice = createSlice({
     setTasksFilter: (state, action) => {
       state.filteredTasks = state.tasks.filter(
         (task) =>
-<<<<<<< HEAD:front/src/redux/taskSlice.js
-          task.summary.toLowerCase().includes(action.payload.filter.toLowerCase()) ||
-          task.description.toLowerCase().includes(action.payload.filter.toLowerCase()),
-      );
-    },
-
-    setDueDate: (state, action) => {
-      const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
-      state.tasks[id].due_date.date = action.payload.value;
-=======
           task.summery.toLowerCase().includes(action.payload.filter.toLowerCase()) ||
           task.description.toLowerCase().includes(action.payload.filter.toLowerCase()),
       );
->>>>>>> main:src/redux/taskSlice.js
     },
 
     setDataTextContent: (state, action) => {

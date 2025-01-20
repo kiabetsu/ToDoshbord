@@ -24,6 +24,7 @@ const AutoWidthInput = ({ value, setValue }) => {
         ref={inputRef}
         type="text"
         value={value}
+        placeholder="Briefly describe your task..."
         onChange={(e) => setValue(e.target.value)}
       />
     </div>

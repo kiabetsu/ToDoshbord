@@ -124,17 +124,11 @@ export const PersonalDashboard = () => {
           <div className={styles.content}>
             {statuses.map((statusTitle, i) => (
               <ColumnBlockRefactor key={i} statusTitle={statusTitle}>
-<<<<<<< HEAD:front/src/Pages/PersonalDashboard/index.jsx
                 <SortableContext items={tasksIds} strategy={verticalListSortingStrategy}>
                   <div
                     // ref={setNodeRef}
                     className={styles.tasksList}>
                     {tasks
-=======
-                <div className={styles.tasksList}>
-                  <SortableContext items={tasksIds}>
-                    {filteredTasks
->>>>>>> main:src/Pages/PersonalDashboard/index.jsx
                       .filter((task) => task.status === i)
                       .sort((a, b) => a.order_index - b.order_index)
                       .map((obj) => (
