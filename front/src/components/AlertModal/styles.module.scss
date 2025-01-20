@@ -1,0 +1,64 @@
+.alert {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  width: auto;
+  // height: 170px;
+  gap: 10px;
+  z-index: 1000;
+
+  .alertText {
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.5em;
+  }
+
+  .buttonLine {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 30px;
+
+    button {
+      font-family: 'Inter', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      width: fit-content;
+      padding: 0 10px;
+      height: 2em;
+      display: flex;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      border-radius: 0.5em;
+      border: 1px solid #f9f6f3;
+    }
+    .acceptButton {
+      background-color: #e5566a;
+      color: #2b313f;
+      transition: all 0.2s linear;
+
+      &:hover {
+        background-color: #f9f6f3;
+        color: #e5566a;
+        border: 1px solid #e5566a;
+      }
+    }
+
+    .rejectButton {
+      background-color: #5ba9e9;
+      color: #2b313f;
+      transition: all 0.2s linear;
+
+      &:hover {
+        background-color: #f9f6f3;
+        color: #5ba9e9;
+        border: 1px solid #5ba9e9;
+      }
+    }
+  }
+}
