@@ -48,7 +48,7 @@ export const TaskModal = () => {
       setEditedPic(data ? data.image : null);
       setEditedSummary(data ? data.summary : '');
       setEditedDescription(data ? data.description : '');
-      setEditedDueDate(data ? data.due_date.date : '');
+      setEditedDueDate(data ? data.due_date.date : currentDate);
       setEditedAttachments(data ? data.attachments : []);
       setLoaded(true);
     }
@@ -60,12 +60,13 @@ export const TaskModal = () => {
     e.stopPropagation();
 
     if (
-      editedPic !== data.image ||
-      editedSummary !== data.summary ||
-      editedDescription !== data.description ||
-      editedDueDate !== data.due_date.date ||
-      editedAttachments !== data.attachments ||
-      event === 'remove'
+      (editedPic !== data.image ||
+        editedSummary !== data.summary ||
+        editedDescription !== data.description ||
+        editedDueDate !== data.due_date.date ||
+        editedAttachments !== data.attachments ||
+        event === 'remove') &&
+      !modal.isCreating
     ) {
       openConfirm(event);
     } else {
@@ -150,22 +151,6 @@ export const TaskModal = () => {
     </>
   );
 
-  const handleKeyDown = (event) => {
-    // Обработка нажатия клавиши Enter
-    if (event.key === 'Enter') {
-      event.preventDefault(); // Предотвращаем переход на новую строку
-      const selection = window.getSelection();
-      const range = selection.getRangeAt(0);
-      const newLine = document.createElement('div'); // Создаем новый div для новой строки
-      newLine.innerHTML = '<br>'; // Добавляем перенос строки
-      range.insertNode(newLine); // Вставляем новый div в текущее положение курсора
-      range.setStartAfter(newLine); // Устанавливаем курсор после нового div
-      range.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
-  };
-
   return (
     <ModalRefactored modalType="task">
       <AlertModal id={data.id} />
@@ -185,6 +170,7 @@ export const TaskModal = () => {
               value={editedSummary}
               placeholder="Briefly describe your task..."
               onChange={(e) => setEditedSummary(e.target.value)}
+              required={true}
             />
           </TaskModalField>
           <TaskModalField icon={<AlignLeft />} name="Description">
@@ -200,7 +186,7 @@ export const TaskModal = () => {
             <input
               type="date"
               className={styles.dateInput}
-              value={editedDueDate === null ? currentDate : editedDueDate}
+              value={editedDueDate === '' ? currentDate : editedDueDate}
               onChange={(e) => setEditedDueDate(e.target.value)}
             />
           </TaskModalField>

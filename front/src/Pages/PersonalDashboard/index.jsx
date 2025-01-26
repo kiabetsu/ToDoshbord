@@ -45,29 +45,6 @@ export const PersonalDashboard = () => {
 
   const onDragOver = (event) => {
     setOverId(event.over?.id);
-
-    // const { active, over } = event;
-
-    // if (!over) return;
-
-    // const activeId = active.id;
-    // const overId = over.id;
-
-    // if (activeId === overId) return;
-
-    // const activeIndex = tasks.findIndex((item) => item.id === active.id);
-    // const overIndex = tasks.findIndex((item) => item.id === over.id);
-
-    // let newItems = [...tasks];
-
-    // newItems[activeIndex].status = newItems[overIndex].status;
-    // arrayMove(tasks, activeIndex, overIndex);
-
-    // dispatch(setDndUpdate(newItems));
-  };
-
-  const onDragEnd = (event) => {
-    // setActiveTask(null);
     const { active, over } = event;
 
     const activeItem = tasks.find((item) => item.id === active.id);
@@ -111,6 +88,10 @@ export const PersonalDashboard = () => {
       });
     }
     dispatch(setDndUpdate(newItems));
+  };
+
+  const onDragEnd = (event) => {
+    // setActiveTask(null);
 
     setActiveId(null); // Сбрасываем активный элемент
     setOverId(null); // Сбрасываем элемент, на который навели
@@ -133,7 +114,9 @@ export const PersonalDashboard = () => {
           <div className={styles.content}>
             {statuses.map((statusTitle, i) => (
               <ColumnBlockRefactor key={i} statusTitle={statusTitle}>
-                <SortableContext items={tasks} strategy={verticalListSortingStrategy}>
+                <SortableContext
+                  items={tasks.filter((task) => task.status === i)}
+                  strategy={verticalListSortingStrategy}>
                   <div className={styles.tasksList}>
                     {tasks
                       .filter((task) => task.status === i)

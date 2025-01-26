@@ -1,20 +1,5 @@
 export const data = [
   {
-    id: 0,
-    order_index: 0,
-    image: '',
-    img: '../asset/Wallpaper green 3.jpg',
-    summary: 'Read books',
-    description:
-      'According to research by the University of Michigan, it is reading fiction that helps activate new areas of the brain and develop imagination. However, while playing on a computer, these same areas of the brain remain unused.',
-    due_date: {
-      date: '2024-12-12',
-      date_format: 'Dec 12, 2024',
-    },
-    status: 0,
-    attachments: [],
-  },
-  {
     id: 1,
     order_index: 0,
     image: '',
@@ -79,6 +64,20 @@ export const data = [
     due_date: {
       date: '2024-12-31',
       date_format: 'Dec 31, 2024',
+    },
+    status: 0,
+    attachments: [],
+  },
+  {
+    id: 6,
+    order_index: 0,
+    image: '',
+    summary: 'Read books',
+    description:
+      'According to research by the University of Michigan, it is reading fiction that helps activate new areas of the brain and develop imagination. However, while playing on a computer, these same areas of the brain remain unused.',
+    due_date: {
+      date: '2024-12-12',
+      date_format: 'Dec 12, 2024',
     },
     status: 0,
     attachments: [],
