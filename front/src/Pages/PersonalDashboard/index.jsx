@@ -9,6 +9,7 @@ import {
   useSensors,
   DragOverlay,
   activationConstraint,
+  useDndMonitor,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -17,106 +18,114 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { createPortal } from 'react-dom';
-import { useDroppable } from '@dnd-kit/core';
 
 import styles from './style.module.scss';
-import { Modal, ModalRefactored } from '../../components/Modal';
+
 import { TaskModal } from '../../components/TaskModal';
 import { Header } from '../../components/Header';
 import { ColumnBlockRefactor } from '../../components/ColumnBlock';
 import { TaskBlock } from '../../components/TaskBlock';
-import { setOrderIndex } from '../../redux/taskSlice';
-import { AlertModal } from '../../components/AlertModal';
+import { setDndUpdate } from '../../redux/taskSlice';
 
 export const PersonalDashboard = () => {
-  const { statuses, modal, tasks, filteredTasks } = useSelector((state) => state.tasks);
-  // eslint-disable-next-line no-undef
+  const { statuses, tasks, filteredTasks } = useSelector((state) => state.tasks);
   const dispatch = useDispatch();
 
   const tasksIds =
     tasks === filteredTasks ? tasks.map((obj) => obj.id) : filteredTasks.map((obj) => obj.id);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 10 } }),
-    // useSensor(KeyboardSensor, {
-    //   coordinateGetter: sortableKeyboardCoordinates,
-    // }),
-  );
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 10 } }));
 
-  // const { setNodeRef } = useDroppable({
-  //   id,
-  // });
-
-  const [activeTask, setActiveTask] = React.useState(null);
+  const [activeId, setActiveId] = React.useState(null);
+  const [overId, setOverId] = React.useState(null);
 
   const onDragStart = (event) => {
-    //   if (event.active.data?.current?.type === 'task') {
-    //     const dragElem = {
-    //       id: event.active.id,
-    //       order_index: event.active.data.current.order_index,
-    //       summary: event.active.data.current.summary,
-    //       description: event.active.data.current.description,
-    //       due_date: {
-    //         date: event.active.data.current.due_date.date,
-    //         date_format: event.active.data.current.due_date.date_format,
-    //       },
-    //       status: event.active.data.current.status,
-    //       attachments: [],
-    //     };
-    //     setActiveTask(dragElem);
-    //   }
-  };
-
-  const onDragEnd = (event) => {
-    setActiveTask(null);
-
-    //   const { active, over } = event;
-    //   if (!over) return;
-
-    //   // const activeTaskId = active.id;
-    //   // const overTaskId = over.id;
-
-    //   // if (activeTaskId !== overTaskId) {
-    //   // }
+    setActiveId(event.active.id);
   };
 
   const onDragOver = (event) => {
-    const { active, over } = event;
+    setOverId(event.over?.id);
 
-    const activeOrder_index = active.data.current.order_index;
-    const overOrder_index = over.data.current.order_index;
+    // const { active, over } = event;
 
     // if (!over) return;
 
-    // const activeTaskId = active.id;
-    // const overTaskId = over.id;
+    // const activeId = active.id;
+    // const overId = over.id;
 
-    // if (activeTaskId !== overTaskId) {
-    //   const isActiveTask = active.data.current?.type === 'task';
-    //   const isOverTask = over.data.current?.type === 'task';
+    // if (activeId === overId) return;
 
-    //   if (isActiveTask && isOverTask) {
-    //     dispatch(
-    //       setOrderIndex({
-    //         active: active,
-    //         over: over,
-    //       }),
-    //     );
-    //   }
-    // }
+    // const activeIndex = tasks.findIndex((item) => item.id === active.id);
+    // const overIndex = tasks.findIndex((item) => item.id === over.id);
+
+    // let newItems = [...tasks];
+
+    // newItems[activeIndex].status = newItems[overIndex].status;
+    // arrayMove(tasks, activeIndex, overIndex);
+
+    // dispatch(setDndUpdate(newItems));
   };
+
+  const onDragEnd = (event) => {
+    // setActiveTask(null);
+    const { active, over } = event;
+
+    const activeItem = tasks.find((item) => item.id === active.id);
+    const overItem = tasks.find((item) => item.id === over.id);
+
+    const isSameColumn = activeItem.status === overItem.status;
+
+    let newItems = [...tasks];
+
+    const oldIndex = tasks.findIndex((item) => item.id === active.id);
+    const newIndex = tasks.findIndex((item) => item.id === over.id);
+
+    if (isSameColumn) {
+      newItems = arrayMove(tasks, oldIndex, newIndex);
+
+      newItems = newItems.map((item, index) => ({
+        ...item,
+        order_index: item.status === activeItem.status ? index : item.order_index,
+      }));
+    } else {
+      newItems = arrayMove(tasks, oldIndex, newIndex);
+
+      newItems[newIndex] = {
+        ...newItems[newIndex],
+        status: overItem.status,
+        order_index: overItem.order_index,
+      };
+
+      newItems = newItems.map((item) => {
+        if (item.status === activeItem.status && item.order_index > activeItem.order_index) {
+          return { ...item, order_index: item.order_index - 1 };
+        }
+        return item;
+      });
+
+      newItems = newItems.map((item) => {
+        if (item.status === overItem.status && item.order_index >= overItem.order_index) {
+          return { ...item, order_index: item.order_index + 1 };
+        }
+        return item;
+      });
+    }
+    dispatch(setDndUpdate(newItems));
+
+    setActiveId(null); // Сбрасываем активный элемент
+    setOverId(null); // Сбрасываем элемент, на который навели
+  };
+
+  const activeItem = tasks.find((item) => item.id === activeId);
 
   return (
     <>
-      {/* {modal.isOpen && <Modal id={modal.id} />} */}
-      {/* <Modal id={modal.id} /> */}
-      {/* <AlertModal /> */}
-
       <TaskModal />
       <Header />
       <div className={styles.main}>
         <h2>Road map</h2>
         <DndContext
+          collisionDetection={closestCenter}
           sensors={sensors}
           onDragStart={onDragStart}
           onDragEnd={onDragEnd}
@@ -124,10 +133,8 @@ export const PersonalDashboard = () => {
           <div className={styles.content}>
             {statuses.map((statusTitle, i) => (
               <ColumnBlockRefactor key={i} statusTitle={statusTitle}>
-                <SortableContext items={tasksIds} strategy={verticalListSortingStrategy}>
-                  <div
-                    // ref={setNodeRef}
-                    className={styles.tasksList}>
+                <SortableContext items={tasks} strategy={verticalListSortingStrategy}>
+                  <div className={styles.tasksList}>
                     {tasks
                       .filter((task) => task.status === i)
                       .sort((a, b) => a.order_index - b.order_index)
@@ -139,10 +146,8 @@ export const PersonalDashboard = () => {
               </ColumnBlockRefactor>
             ))}
           </div>
-          {createPortal(
-            <DragOverlay>{activeTask && <TaskBlock {...activeTask} />}</DragOverlay>,
-            document.body,
-          )}
+
+          <DragOverlay>{activeItem && <TaskBlock {...activeItem} />}</DragOverlay>
         </DndContext>
       </div>
     </>

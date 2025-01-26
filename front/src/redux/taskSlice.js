@@ -1,12 +1,6 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-import { data, newData } from '../asset/data.js';
-
-const getDate = (date) => {
-  return `${date.getDate(date)}.${date.getMonth(date) + 1}.${date.getFullYear(
-    date,
-  )} ${date.getHours(date)}:${date.getMinutes(date)}`;
-};
+import { data } from '../asset/data.js';
 
 const Months = [
   { number: '01', name: 'Jan' },
@@ -120,75 +114,9 @@ export const taskSlice = createSlice({
       state.tasks[id].status = action.payload.status;
     },
 
-    // setOrderIndex: (state, action) => {
-    //   const serialize = JSON.stringify(action.payload);
-
-    //   const isActiveTask = action.payload.active.data.current?.type === 'task';
-    //   const isOverTask = action.payload.over.data.current?.type === 'task';
-
-    //   if (isActiveTask && isOverTask) {
-    //     const activeTaskId = action.payload.active.id;
-    //     const overTaskId = action.payload.over.id;
-
-    //     const activeOrder = action.payload.active.data.current?.order_index;
-    //     const overOrder = action.payload.active.data.current?.order_index;
-
-    //     const activeStatus = action.payload.active.data.current?.status;
-    //     const overStatus = action.payload.over.data.current?.status;
-
-    //     const activeIndex = state.tasks.findIndex((task) => task.id === activeTaskId);
-    //     const overIndex = state.tasks.findIndex((task) => task.id === overTaskId);
-
-    //     if (state.tasks[activeIndex].status === overStatus) {
-    //       state.tasks[activeIndex].order_index = overOrder;
-    //       state.tasks[overIndex].order_index = activeOrder;
-    //     } else {
-    //       const sortedData = state.tasks.sort((a, b) => b.order_index - a.order_index);
-    //       sortedData.forEach((task) => {
-    //         if (task.status === overStatus && task.order_index >= overIndex) {
-    //           const sortingIndex = state.tasks.indexOf(task);
-    //           state.tasks[sortingIndex].order_index += 1;
-    //         }
-    //       });
-    //       state.tasks[activeIndex].status = overStatus;
-    //       state.tasks[activeIndex].order_index = overOrder;
-    //     }
-    //   }
-    // },
-
-    setIdDraggingComponent: (state, action) => {
-      state.idDraggingComponent = action.payload;
+    setDndUpdate: (state, action) => {
+      state.tasks = action.payload;
     },
-
-    // setUploadAttachment: (state, action) => {
-    //   const getDate = (date) => {
-    //     return `${date.getDate(date)}.${date.getMonth(date) + 1}.${date.getFullYear(
-    //       date,
-    //     )} ${date.getHours(date)}:${date.getMinutes(date)}`;
-    //   };
-
-    //   const newFile = action.payload.acceptedFiles[0];
-    //   newFile['uploadTime'] = { dateFormat: Date(Date.now()), stringFormat: getDate(new Date()) };
-    //   const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
-    //   const fileList = state.tasks[id].attachments;
-    //   newFile['id'] = fileList.length > 0 ? fileList.at(-1).id + 1 : 0;
-    //   const file = new FileReader();
-    //   file.readAsDataURL(action.payload.acceptedFiles[0]);
-    //   file.onload = function () {
-    //     newFile['preview'] = file.result;
-    //     if (newFile) {
-    //       const updatedList = [...fileList, newFile];
-    //       state.tasks[id].attachments = updatedList;
-    //     }
-    //   };
-    // },
-
-    // setRemoveAttachment: (state, action) => {
-    //   const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
-    //   state.tasks[id].attachments = state.tasks[id].attachments.filter((file) => {
-    //     return file.id !== action.payload.item.id;
-    //   });
-    // },
   },
 });
 
@@ -207,6 +135,7 @@ export const {
   createTask,
   setRemoveTask,
   setTasksFilter,
+  setDndUpdate,
 } = taskSlice.actions;
 
 export default taskSlice.reducer;

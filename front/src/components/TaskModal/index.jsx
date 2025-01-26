@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Baseline,
   Plus,
@@ -10,7 +10,6 @@ import {
   X,
 } from 'lucide-react';
 import TextareaAutosize from 'react-textarea-autosize';
-import DatePicker from 'react-date-picker';
 import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
 
@@ -19,18 +18,9 @@ import { AlertModal } from '../AlertModal';
 import { ImgUpload, DropFileInput } from '../DropFileInput';
 import styles from './styles.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  setDueDate,
-  setModal,
-  setDataTextContent,
-  setData,
-  setRemoveTask,
-  createTask,
-  setAlert,
-} from '../../redux/taskSlice';
-import { Tiptap } from '../Tiptap';
+import { setModal, setData, createTask, setAlert } from '../../redux/taskSlice';
+
 import { TaskModalField } from '../TaskModalField';
-import AutoWidthInput from '../AutoWidthInput';
 
 export const TaskModal = () => {
   const { modal, tasks, alert } = useSelector((state) => state.tasks);
@@ -52,9 +42,6 @@ export const TaskModal = () => {
   const [editedDescription, setEditedDescription] = React.useState(data ? data.description : '');
   const [editedDueDate, setEditedDueDate] = React.useState(data ? data.due_date.date : '');
   const [editedAttachments, setEditedAttachments] = React.useState(data ? data.attachments : []);
-  const editableDescriptionRef = React.useRef(null);
-  const summaryInputRef = React.useRef(null);
-  const summarySpanRef = React.useRef(null);
 
   React.useEffect(() => {
     if ((data || modal.isCreating) && !isLoaded) {
@@ -66,12 +53,6 @@ export const TaskModal = () => {
       setLoaded(true);
     }
   }, [modal]);
-
-  // React.useEffect(() => {
-  //   if (isLoaded) {
-  //     editableDescriptionRef.current.textContent = editedDescription;
-  //   }
-  // }, [editedDescription]);
 
   const modalRef = React.useRef();
 
@@ -198,7 +179,13 @@ export const TaskModal = () => {
         <div className={styles.content}>
           <TaskModalField icon={<Baseline />} name="Summary" style={{ position: 'relative' }}>
             <div className={styles.buttonRow}>{buttonRow}</div>
-            <AutoWidthInput value={editedSummary} setValue={setEditedSummary} />
+            <input
+              type="text"
+              className={styles.summaryInput}
+              value={editedSummary}
+              placeholder="Briefly describe your task..."
+              onChange={(e) => setEditedSummary(e.target.value)}
+            />
           </TaskModalField>
           <TaskModalField icon={<AlignLeft />} name="Description">
             <TextareaAutosize

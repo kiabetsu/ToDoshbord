@@ -1,16 +1,15 @@
 import React from 'react';
 import { CalendarDays, Paperclip } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import TextareaAutosize from 'react-textarea-autosize';
 
 import styles from './style.module.scss';
-import pic from '../../asset/Image.png';
 import ava from '../../asset/Profile 01.png';
 import emj1 from '../../asset/Emoji reaction.svg';
 import emj2 from '../../asset/Emoji reaction (1).svg';
-import { setIdDraggingComponent, setModal, setOrderIndex, setStatus } from '../../redux/taskSlice';
+import { setModal } from '../../redux/taskSlice';
 
 export const TaskBlock = ({
   image,
@@ -22,8 +21,6 @@ export const TaskBlock = ({
   order_index,
   attachments,
 }) => {
-  const ref = React.useRef(null);
-
   const dispatch = useDispatch();
 
   let currentDate = new Date();
@@ -51,11 +48,12 @@ export const TaskBlock = ({
   const style = {
     transition,
     transform: CSS.Translate.toString(transform),
+    // height: setNodeRef.,
   };
 
-  if (isDragging) {
-    return <div ref={setNodeRef} style={style} className={styles.draggingSkeleton}></div>;
-  }
+  // if (isDragging) {
+  //   return <div ref={setNodeRef} style={style} className={styles.draggingSkeleton}></div>;
+  // }
 
   return (
     <div
@@ -84,7 +82,6 @@ export const TaskBlock = ({
         minRows={1}
         maxRows={3}
       />
-
       <div className={styles.info}>
         <div className={styles.leftInfo}>
           <div className={styles.dueDate}>
@@ -95,7 +92,7 @@ export const TaskBlock = ({
             <div className={styles.attachmentsBlock}>
               <Paperclip />
               <p className={styles.attachments}>
-                {attachments.length} attachment{attachments.length > 1 && 's'}{' '}
+                {attachments.length} attachment{attachments.length > 1 && 's'}
               </p>
             </div>
           )}
@@ -104,7 +101,6 @@ export const TaskBlock = ({
           <img src={ava} alt="Assign to" />
         </div>
       </div>
-
       <div
         className={styles.progressBar}
         style={{

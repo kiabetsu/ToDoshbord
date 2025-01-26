@@ -9,9 +9,6 @@ function App() {
   return (
     <div className="App">
       <PersonalDashboard />
-      {/* <Test /> */}
-      {/* <AuthCard /> */}
-      {/* <Tiptap content="111" type="Description" /> */}
     </div>
   );
 }
