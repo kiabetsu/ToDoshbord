@@ -35,12 +35,12 @@ export const TaskBlock = ({
     id: id,
     data: {
       type: 'task',
-      summary,
-      description,
-      due_date,
-      status,
-      order_index,
-      image,
+      // summary,
+      // description,
+      // due_date,
+      // status,
+      // order_index,
+      // image,
     },
     // disabled: openModalWindow,
   });

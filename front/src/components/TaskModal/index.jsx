@@ -42,6 +42,7 @@ export const TaskModal = () => {
   const [editedDescription, setEditedDescription] = React.useState(data ? data.description : '');
   const [editedDueDate, setEditedDueDate] = React.useState(data ? data.due_date.date : '');
   const [editedAttachments, setEditedAttachments] = React.useState(data ? data.attachments : []);
+  const [isRequiredFiled, setRequiredField] = React.useState(false);
 
   React.useEffect(() => {
     if ((data || modal.isCreating) && !isLoaded) {
@@ -107,18 +108,22 @@ export const TaskModal = () => {
   };
 
   const onConfirm = (summary, description, due_date, attachments, pic) => {
-    dispatch(
-      setData({
-        id: data.id,
-        summary: summary,
-        description: description,
-        due_date: due_date,
-        attachments: attachments,
-        pic: pic,
-      }),
-      dispatch(setModal({ isOpen: false, id: null, isCreating: false })),
-    );
-    setLoaded(false);
+    if (summary) {
+      dispatch(
+        setData({
+          id: data.id,
+          summary: summary,
+          description: description,
+          due_date: due_date,
+          attachments: attachments,
+          pic: pic,
+        }),
+        dispatch(setModal({ isOpen: false, id: null, isCreating: false })),
+      );
+      setLoaded(false);
+    } else {
+      setRequiredField(true);
+    }
   };
 
   const onRemoveTask = (e) => {
@@ -162,15 +167,18 @@ export const TaskModal = () => {
           <ImgUpload image={editedPic} setImage={setEditedPic} />
         </div>
         <div className={styles.content}>
-          <TaskModalField icon={<Baseline />} name="Summary" style={{ position: 'relative' }}>
+          <TaskModalField icon={<Baseline />} name="Summary*" style={{ position: 'relative' }}>
             <div className={styles.buttonRow}>{buttonRow}</div>
             <input
               type="text"
               className={styles.summaryInput}
+              style={{ border: `${isRequiredFiled ? '1px solid red' : ''}` }}
               value={editedSummary}
               placeholder="Briefly describe your task..."
-              onChange={(e) => setEditedSummary(e.target.value)}
-              required={true}
+              onChange={(e) => {
+                setRequiredField(false);
+                setEditedSummary(e.target.value);
+              }}
             />
           </TaskModalField>
           <TaskModalField icon={<AlignLeft />} name="Description">

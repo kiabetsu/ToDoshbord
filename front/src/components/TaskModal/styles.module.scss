@@ -83,7 +83,7 @@
   background-color: #f9f6f3;
   position: absolute;
   top: 200px;
-  padding: 10px;
+  padding: 20px 10px 10px 10px;
   border-radius: 16px;
   gap: 1em;
   box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.3);
@@ -159,6 +159,7 @@
   transition: 0.3s ease;
   outline: none;
   color: #172b4d;
+  transition: all 0.2s ease;
 
   &:hover,
   &:focus {
@@ -298,7 +299,7 @@ button {
   display: flex;
   // width: 500px;
   position: absolute;
-  top: -10px;
+  top: -13px;
   right: 0px;
   color: red;
   gap: 10px;

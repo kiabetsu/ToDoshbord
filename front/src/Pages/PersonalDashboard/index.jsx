@@ -3,21 +3,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   DndContext,
   closestCenter,
-  KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
   DragOverlay,
-  activationConstraint,
-  useDndMonitor,
 } from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { createPortal } from 'react-dom';
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 import styles from './style.module.scss';
 
@@ -30,9 +21,6 @@ import { setDndUpdate } from '../../redux/taskSlice';
 export const PersonalDashboard = () => {
   const { statuses, tasks, filteredTasks } = useSelector((state) => state.tasks);
   const dispatch = useDispatch();
-
-  const tasksIds =
-    tasks === filteredTasks ? tasks.map((obj) => obj.id) : filteredTasks.map((obj) => obj.id);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 10 } }));
 
@@ -58,6 +46,7 @@ export const PersonalDashboard = () => {
     const newIndex = tasks.findIndex((item) => item.id === over.id);
 
     if (isSameColumn) {
+      // if (active.id !== over.id && !over.id.startsWith('empty-')) {
       newItems = arrayMove(tasks, oldIndex, newIndex);
 
       newItems = newItems.map((item, index) => ({
@@ -86,18 +75,23 @@ export const PersonalDashboard = () => {
         }
         return item;
       });
+      // }
     }
     dispatch(setDndUpdate(newItems));
   };
 
   const onDragEnd = (event) => {
-    // setActiveTask(null);
-
-    setActiveId(null); // Сбрасываем активный элемент
-    setOverId(null); // Сбрасываем элемент, на который навели
+    setActiveId(null);
+    setOverId(null);
   };
 
   const activeItem = tasks.find((item) => item.id === activeId);
+
+  // statuses.forEach((status, id) => {
+  //   if (tasks.filter((task) => task.status === id).length === 0) {
+  //     tasks.push({  isPlaceholder: true, status: id, id: `empty-${id}` });
+  //   }
+  // });
 
   return (
     <>

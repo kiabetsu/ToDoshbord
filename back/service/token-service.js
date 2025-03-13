@@ -1,37 +1,57 @@
 const jwt = require('jsonwebtoken');
-const tokenModel = require('../modules/token-model');
+const db = require('../db');
 
 class TokenService {
   generateToken(payload) {
-    const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' });
-    const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '30d' });
+    const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_TOKEN, { expiresIn: '15m' });
+    const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_TOKEN, { expiresIn: '30d' });
     return { accessToken, refreshToken };
   }
 
-  validationAccessToken(token) {
+  async saveToken(id, token) {
+    const findUser = await db.query('SELECT * FROM tokens WHERE user_id = $1', [id]);
+    if (findUser.rows.length != 0) {
+      const tokenUpdate = await db.query(
+        'UPDATE tokens set refresh_token = $1 WHERE user_id = $2 RETURNING *',
+        [token, id],
+      );
+      return tokenUpdate.rows[0];
+    }
+    await db.query('INSERT INTO tokens (user_id, refresh_token) VALUES ($1, $2) RETURNING *', [
+      id,
+      token,
+    ]);
+    const addedToken = await db.query('SELECT * FROM tokens WHERE user_id = $1', [id]);
+    return addedToken.rows[0];
+  }
+
+  async removeToken(token) {
+    const removeToken = await db.query('DELETE FROM TOKENS WHERE refresh_token = $1', [token]);
+    return removeToken;
+  }
+
+  validateAccessToken(token) {
     try {
-      return jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      const verify = jwt.verify(token, process.env.JWT_ACCESS_TOKEN);
+      return verify;
     } catch (error) {
       return null;
     }
   }
 
-  validationRefreshToken(token) {
+  validateRefreshToken(token) {
     try {
-      return jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+      console.log('token', token);
+      const verify = jwt.verify(token, process.env.JWT_REFRESH_TOKEN);
+      return verify;
     } catch (error) {
       return null;
     }
   }
 
-  async saveToken(userId, refreshToken) {
-    const tokenData = await tokenModel.findOne({ userId });
-    if (tokenData) {
-      tokenData.refreshToken = refreshToken;
-      await tokenData.save();
-    }
-    const token = await tokenModel.create({ user: userId, token });
-    return token;
+  async findToken(token) {
+    const findToken = await db.query('SELECT * FROM tokens WHERE refresh_token = $1', [token]);
+    return findToken.rows[0];
   }
 }
 
