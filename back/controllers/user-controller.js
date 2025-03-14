@@ -1,6 +1,8 @@
 const tokenService = require('../service/token-service');
 const userService = require('../service/user-service');
+const TaskService = require('../service/task-service');
 const { validationResult, cookie } = require('express-validator');
+const db = require('../db');
 
 class userController {
   async registration(req, res, next) {
@@ -45,7 +47,10 @@ class userController {
     try {
       const refreshToken = req.cookies.refreshToken;
       const userData = await userService.refresh(refreshToken);
-      res.cookie('refreshToken', userData.refreshToken);
+      res.cookie('refreshToken', user.refreshToken, {
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+      });
       res.json(userData);
     } catch (error) {
       next(error);
@@ -54,7 +59,10 @@ class userController {
 
   async getTasks(req, res, next) {
     try {
-      res.json('work');
+      // const tasks = await db.query('SELECT * FROM tasks');
+      const { id } = req.user;
+      const tasks = await TaskService.getTasks(id);
+      return res.json(tasks);
     } catch (error) {
       next(error);
     }
@@ -62,6 +70,10 @@ class userController {
 
   async addTask(req, res, next) {
     try {
+      const user_id = req.user.id;
+      const { summary, description, due_date } = req.body;
+      const task = await TaskService.addTask(user_id, summary, description, due_date);
+      return res.json(task);
     } catch (error) {
       next(error);
     }
@@ -69,6 +81,9 @@ class userController {
 
   async updateTask(req, res, next) {
     try {
+      const { id, summary, description, due_date } = req.body;
+      const task = await TaskService.updateTask(id, summary, description, due_date);
+      return res.json(task);
     } catch (error) {
       next(error);
     }
@@ -76,6 +91,9 @@ class userController {
 
   async deleteTask(req, res, next) {
     try {
+      const { id } = req.body;
+      const task = await TaskService.deleteTask(id);
+      return res.json(task);
     } catch (error) {
       next(error);
     }
