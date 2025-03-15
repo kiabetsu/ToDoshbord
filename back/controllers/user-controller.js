@@ -103,8 +103,9 @@ class userController {
     try {
       const user_id = req.user.id;
       const { changes } = req.body;
-      const changeData = await TaskService.dndChange(user_id, changes);
-      return res.json(changeData);
+      await TaskService.dndChange(changes);
+      const tasks = await TaskService.getTasks(user_id);
+      return res.json(tasks);
     } catch (error) {
       next(error);
     }

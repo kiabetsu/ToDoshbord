@@ -43,23 +43,19 @@ class TaskService {
     return deletedTask.rows[0];
   }
 
-  async dndChange(user_id, changeData) {
+  async dndChange(changeData) {
     const tasks_id = Object.keys(changeData);
     for (let id of tasks_id) {
       const orderIndex = changeData[id].order_index;
       console.log('orderIndex type', typeof orderIndex);
       const status = changeData[id].status;
       console.log('status type', typeof status);
-      await db.query('UPDATE tasks SET status = $1 and order_index = $2 WHERE id = $3 ', [
+      await db.query('UPDATE tasks SET status = $1, order_index = $2 WHERE id = $3 ', [
         status,
         orderIndex,
         id,
       ]);
     }
-    const tasks = await db.query('SELECT * FROM tasks WHERE user_id = $1', [
-      user_id.rows[0].user_id,
-    ]);
-    return tasks.rows;
   }
 }
 
