@@ -98,6 +98,17 @@ class userController {
       next(error);
     }
   }
+
+  async dndChange(req, res, next) {
+    try {
+      const user_id = req.user.id;
+      const { changes } = req.body;
+      const changeData = await TaskService.dndChange(user_id, changes);
+      return res.json(changeData);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new userController();

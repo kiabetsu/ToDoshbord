@@ -12,5 +12,6 @@ router.get('/task/get', authMiddleware, userController.getTasks);
 router.post('/task/add', authMiddleware, userController.addTask);
 router.put('/task/update', authMiddleware, userController.updateTask);
 router.delete('/task/delete', authMiddleware, userController.deleteTask);
+router.post('/task/dndChange', authMiddleware, userController.dndChange);
 
 module.exports = router;

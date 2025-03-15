@@ -1,4 +1,3 @@
-const UserModel = require('../modules/user-model');
 const bcrypt = require('bcrypt');
 const UserDto = require('../dtos/user-dto');
 const tokenService = require('./token-service');
