@@ -141,9 +141,6 @@ export const ImgUpload = ({ image, setImage }) => {
 
     const img = new Image();
     const obj = URL.createObjectURL(acceptedFiles[0]);
-
-    console.log('srabotal');
-
     const file = new FileReader();
     file.readAsDataURL(acceptedFiles[0]);
     file.onload = function () {

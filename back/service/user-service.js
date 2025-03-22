@@ -6,12 +6,13 @@ const ApiErrors = require('../exceptions/api-error');
 
 class UserService {
   async registration(username, password, email) {
+    console.log('username', username, 'password', password, 'email', email);
     const candidateEmail = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     if (candidateEmail.rows.length != 0) {
       throw ApiErrors.BadRequest(`Пользователь с почтовым адресом ${email} уже существует`);
     }
     const candidateUsername = await findUser(username);
-    if (candidateUsername.rows.length != 0) {
+    if (candidateUsername !== undefined) {
       throw ApiErrors.BadRequest(`Пользователь с именем ${username} уже существует`);
     }
 
@@ -50,12 +51,10 @@ class UserService {
   async refresh(token) {
     const userData = tokenService.validateRefreshToken(token);
     const tokenFromDB = await tokenService.findToken(token);
-    console.log('tokenFromDB', tokenFromDB);
     if (!userData || !tokenFromDB) {
       throw ApiErrors.Unauthorized();
     }
     const user = await db.query('SELECT * FROM users WHERE id = $1', [userData.id]);
-    console.log('user', user.rows[0]);
     const userDto = new UserDto(user.rows[0]);
     const tokens = tokenService.generateToken({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);

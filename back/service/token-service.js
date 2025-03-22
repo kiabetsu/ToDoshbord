@@ -41,7 +41,6 @@ class TokenService {
 
   validateRefreshToken(token) {
     try {
-      console.log('token', token);
       const verify = jwt.verify(token, process.env.JWT_REFRESH_TOKEN);
       return verify;
     } catch (error) {

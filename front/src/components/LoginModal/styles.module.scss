@@ -4,6 +4,7 @@
   width: 100vw;
   height: 100vh;
   z-index: 0;
+  transition: 0.2s ease all;
   // top: 50%;
   // left: 50%;
   // transform: translate(-50%, -50%);
@@ -14,7 +15,7 @@
     left: 50%;
     width: 640px;
     transform: translate(-50%, -50%);
-    color: #111;
+    // color: #111;
 
     a {
       color: #111;
@@ -22,7 +23,7 @@
       font-weight: 400;
     }
     span {
-      color: #111;
+      // color: #111;
 
       font-size: 15px;
       font-weight: 400;
@@ -55,60 +56,11 @@
         .inputBox {
           display: flex;
           flex-direction: column;
-          gap: 24px;
+          gap: 5px;
           width: 528px;
 
-          .floatingGroup {
-            position: relative;
-            height: 56px;
-            width: 100%;
-            display: flex;
-            margin-top: 31px;
-
-            .inputText {
-              font-size: 18px;
-              flex: 1;
-              height: auto;
-              border: solid 1px rgba($color: #666, $alpha: 0.35);
-              border-radius: 12px;
-              background-color: #ffffff;
-              padding: 0 8px;
-            }
-
-            .floatingLabel {
-              position: absolute;
-              pointer-events: none;
-              left: 20px;
-              top: 18px;
-              transition: 0.2s ease all;
-              color: #666666;
-              font-size: 18px;
-            }
-
-            .hidePassword {
-              position: absolute;
-              top: -25px;
-              right: 10px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              cursor: pointer;
-              color: rgba($color: #666, $alpha: 0.8);
-              font-weight: 400;
-              font-size: 16px;
-            }
-
-            input:focus ~ .floatingLabel,
-            input:not(:focus):valid ~ .floatingLabel {
-              top: -25px;
-
-              left: 10px;
-              font-size: 16px;
-              opacity: 1;
-            }
-          }
-
           .loginButtonAndAgree {
+            margin-top: 10px;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -117,10 +69,11 @@
             align-items: center;
 
             .loginButton {
+              margin-top: 5px;
               font-family: 'Inter', sans-serif;
               font-size: 22px;
               font-weight: 500;
-              background-color: rgba($color: #666, $alpha: 0.5);
+              background-color: lighten(#111, 10%);
               color: #ffffff;
               height: 64px;
               border-radius: 40px;
@@ -143,6 +96,65 @@
                 color: darken(#111, 20%);
                 border: 1px solid darken(#111, 20%);
                 transform: scale(0.9);
+              }
+            }
+
+            .inactiveButton {
+              margin-top: 5px;
+              height: 64px;
+
+              font-family: 'Inter', sans-serif;
+              font-size: 22px;
+              font-weight: 500;
+              background-color: rgba($color: #666, $alpha: 0.5);
+              color: #ffffff;
+              border-radius: 40px;
+              width: 100%;
+              text-align: center;
+              justify-content: center;
+              align-items: center;
+              border: 1px solid none;
+              transition: 0.3s ease;
+              cursor: not-allowed;
+            }
+
+            .shake {
+              animation: shake 0.4s;
+            }
+
+            @keyframes shake {
+              0% {
+                transform: translateX(0);
+              }
+              25% {
+                transform: translateX(-5px);
+              }
+              50% {
+                transform: translateX(5px);
+              }
+              75% {
+                transform: translateX(-5px);
+              }
+              100% {
+                transform: translateX(0);
+              }
+            }
+
+            .spinner {
+              border: 5px solid rgba(255, 255, 255, 0.3);
+              border-top: 5px solid white;
+              border-radius: 50%;
+              width: 16px;
+              height: 16px;
+              animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+              0% {
+                transform: rotate(0deg);
+              }
+              100% {
+                transform: rotate(360deg);
               }
             }
 
@@ -190,10 +202,12 @@
                 align-items: center;
                 justify-content: start;
                 height: 20px;
+                color: #111;
               }
             }
 
             span {
+              color: #111;
               display: flex;
               justify-content: center;
               align-items: center;

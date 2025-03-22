@@ -1,0 +1,85 @@
+.floatingGroup {
+  position: relative;
+  // height: 56px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 31px;
+  // max-height: 90px;
+
+  .inputText {
+    font-size: 18px;
+    line-height: 52px;
+    flex: 1;
+    height: auto;
+    border: solid 1px rgba($color: #666, $alpha: 0.35);
+    border-radius: 12px;
+    background-color: #ffffff;
+    padding: 0 8px;
+    // outline: 0;
+    transition: 0.1s linear all;
+  }
+
+  .inputText:focus {
+    outline: #0969da auto 1px;
+  }
+
+  .floatingLabel {
+    position: absolute;
+    pointer-events: none;
+    left: 20px;
+    top: 18px;
+    transition: 0.2s ease all;
+    color: #666666;
+    font-size: 18px;
+  }
+
+  .warningText {
+    color: #d1242f;
+  }
+
+  .warningInput {
+    border: solid 1px #d1242f;
+  }
+
+  .warningInput:focus {
+    outline: #d1242f auto 1px;
+  }
+
+  .inputInfo {
+    margin-top: 5px;
+    margin-left: 5px;
+    text-align: start;
+    color: #111;
+  }
+
+  .warning {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    // color: initial;
+    color: #d1242f;
+  }
+
+  .hidePassword {
+    position: absolute;
+    top: -25px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba($color: #666, $alpha: 0.8);
+    font-weight: 400;
+    font-size: 16px;
+  }
+
+  input:focus ~ .floatingLabel,
+  input:not(:focus):valid ~ .floatingLabel {
+    top: -25px;
+
+    left: 10px;
+    font-size: 16px;
+    opacity: 1;
+  }
+}

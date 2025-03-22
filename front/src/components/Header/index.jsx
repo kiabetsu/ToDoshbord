@@ -17,7 +17,6 @@ export const Header = () => {
   };
   return (
     <>
-      <LoginModal />
       <div className={styles.header}>
         <div className={styles.headerField}>
           <div className={styles.leftSide}>

@@ -47,9 +47,7 @@ class TaskService {
     const tasks_id = Object.keys(changeData);
     for (let id of tasks_id) {
       const orderIndex = changeData[id].order_index;
-      console.log('orderIndex type', typeof orderIndex);
       const status = changeData[id].status;
-      console.log('status type', typeof status);
       await db.query('UPDATE tasks SET status = $1, order_index = $2 WHERE id = $3 ', [
         status,
         orderIndex,
