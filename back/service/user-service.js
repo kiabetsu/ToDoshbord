@@ -6,7 +6,6 @@ const ApiErrors = require('../exceptions/api-error');
 
 class UserService {
   async registration(username, password, email) {
-    console.log('username', username, 'password', password, 'email', email);
     const candidateEmail = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     if (candidateEmail.rows.length != 0) {
       throw ApiErrors.BadRequest(`Пользователь с почтовым адресом ${email} уже существует`);

@@ -4,17 +4,14 @@ import { Columns3, ChevronDown } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import ava from '../../asset/Profile 01.png';
-import { setLogin, setModal } from '../../redux/taskSlice';
+import { setModal } from '../../redux/taskSlice';
 import { Filter } from '../Filter';
-import { LoginModal } from '../LoginModal';
+import { logout } from '../../redux/authSlice';
 
 export const Header = () => {
-  const { modal } = useSelector((state) => state.tasks);
+  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const openLoginModal = () => {
-    dispatch(setLogin({ isOpen: true, tab: 'login' }));
-  };
   return (
     <>
       <div className={styles.header}>
@@ -56,10 +53,11 @@ export const Header = () => {
             <Filter />
 
             <div className={styles.profile}>
-              {/* <img src={ava} alt="Profile " /> */}
-              <button className={styles.login} onClick={() => openLoginModal()}>
-                Log in
+              <button className={styles.login} onClick={() => dispatch(logout())}>
+                Log out
               </button>
+              <span>{user.username}</span>
+              <img src={ava} alt="Profile " />
             </div>
           </div>
         </div>

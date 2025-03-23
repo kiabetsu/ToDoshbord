@@ -9,12 +9,13 @@ const initialState = {
   isLoading: false,
 };
 
+const URL = 'http://localhost:5000/api/';
+
 export const registration = createAsyncThunk(
   'auth/registration',
   async ({ username, email, password }) => {
     try {
-      console.log('zashel');
-      const res = await axios.post('http://localhost:5000/api/registration', {
+      const res = await axios.post(URL + 'registration', {
         username,
         email,
         password,
@@ -28,16 +29,20 @@ export const registration = createAsyncThunk(
 
 export const login = createAsyncThunk('auth/login', async ({ username, password }) => {
   try {
-    console.log('i try', username, password);
-    const res = await axios.post(
-      'http://localhost:5000/api/login',
-      { username, password },
-      { withCredentials: true },
-    );
+    const res = await axios.post(URL + 'login', { username, password }, { withCredentials: true });
     return res.data;
   } catch (error) {
     throw new Error('error per login');
   }
+});
+
+export const logout = createAsyncThunk('auth/logout', async () => {
+  try {
+    await axios.get(URL + 'logout', { withCredentials: true });
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    return {};
+  } catch (error) {}
 });
 
 export const authSlice = createSlice({
@@ -52,10 +57,9 @@ export const authSlice = createSlice({
       }
       state.isLoading = false;
     },
-    logout: (state, action) => {},
   },
   extraReducers: (builder) => {
-    builder.addCase(login.pending, (state, action) => {
+    builder.addCase(login.pending, (state) => {
       state.status = 'padding';
     });
 
@@ -67,11 +71,11 @@ export const authSlice = createSlice({
       state.user = action.payload.user;
     });
 
-    builder.addCase(login.rejected, (state, action) => {
+    builder.addCase(login.rejected, (state) => {
       state.status = 'error';
     });
 
-    builder.addCase(registration.pending, (state, action) => {
+    builder.addCase(registration.pending, (state) => {
       state.status = 'padding';
     });
     builder.addCase(registration.fulfilled, (state, action) => {
@@ -81,12 +85,24 @@ export const authSlice = createSlice({
       localStorage.setItem('user', JSON.stringify(action.payload.user));
       state.user = action.payload.user;
     });
-    builder.addCase(registration.rejected, (state, action) => {
+    builder.addCase(registration.rejected, (state) => {
+      state.status = 'error';
+    });
+
+    builder.addCase(logout.pending, (state) => {
+      state.status = 'padding';
+    });
+    builder.addCase(logout.fulfilled, (state) => {
+      state.status = 'success';
+      state.isAuth = false;
+      localStorage.removeItem('token');
+    });
+    builder.addCase(logout.rejected, (state) => {
       state.status = 'error';
     });
   },
 });
 
-export const { checkAuth, logout } = authSlice.actions;
+export const { checkAuth } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -97,6 +97,12 @@
                 border: 1px solid darken(#111, 20%);
                 transform: scale(0.9);
               }
+
+              &:focus {
+                border: none;
+                outline: solid 3px #0969da;
+                background-color: #111;
+              }
             }
 
             .inactiveButton {

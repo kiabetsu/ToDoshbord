@@ -36,7 +36,6 @@ class userController {
   async logout(req, res, next) {
     try {
       const token = tokenService.removeToken(req.cookies.refreshToken);
-      res.clearCookie('refreshToken');
       res.json(token);
     } catch (error) {
       next(error);
@@ -59,7 +58,6 @@ class userController {
 
   async getTasks(req, res, next) {
     try {
-      // const tasks = await db.query('SELECT * FROM tasks');
       const { id } = req.user;
       const tasks = await TaskService.getTasks(id);
       return res.json(tasks);
