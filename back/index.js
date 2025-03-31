@@ -5,10 +5,13 @@ const cookieParser = require('cookie-parser');
 const router = require('./router/index');
 const ApiError = require('./exceptions/api-error');
 const errorMiddleware = require('./middlewares/error-middleware');
+const path = require('path');
 
 const PORT = process.env.PORT || 5000;
 const app = express();
+const filesDir = path.join(__dirname, '../files');
 
+app.use('/assets', express.static(filesDir));
 app.use(express.json());
 app.use(
   cors({

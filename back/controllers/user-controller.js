@@ -3,6 +3,7 @@ const userService = require('../service/user-service');
 const TaskService = require('../service/task-service');
 const { validationResult, cookie } = require('express-validator');
 const db = require('../db');
+const mime = require('mime');
 
 class userController {
   async registration(req, res, next) {
@@ -57,10 +58,22 @@ class userController {
   }
 
   async getTasks(req, res, next) {
+    console.log('ya tut bil');
     try {
       const { id } = req.user;
       const tasks = await TaskService.getTasks(id);
-      return res.json(tasks);
+      res.json(tasks);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getFile(req, res, next) {
+    try {
+      const { filePath, filename } = req.params;
+      const fileRout = await TaskService.getFile(filePath, filename);
+      res.set('Content-Type', mime.lookup(fileRout) || 'application/octet-stream');
+      res.sendFile(fileRout);
     } catch (error) {
       next(error);
     }
@@ -69,8 +82,9 @@ class userController {
   async addTask(req, res, next) {
     try {
       const user_id = req.user.id;
+      const files = req.files;
       const { summary, description, due_date } = req.body;
-      const task = await TaskService.addTask(user_id, summary, description, due_date);
+      const task = await TaskService.addTask(user_id, summary, description, due_date, files);
       return res.json(task);
     } catch (error) {
       next(error);

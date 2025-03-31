@@ -41,3 +41,11 @@ VALUES (
     'According to research by the University of Michigan, it is reading fiction that helps activate new areas of the brain and develop imagination. However, while playing on a computer, these same areas of the brain remain unused.',
     '2024-12-12', 0, 0
 );
+
+CREATE TABLE attachments (
+    attachment_id SERIAL PRIMARY KEY,
+    task_id INT REFERENCES tasks(id) ON DELETE CASCADE, 
+    file_name VARCHAR(255) NOT NULL,
+    file_path TEXT NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

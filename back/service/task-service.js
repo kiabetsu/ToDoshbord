@@ -1,12 +1,64 @@
 const db = require('../db');
+const path = require('path');
+const fs = require('fs');
+const { url } = require('inspector');
+const ApiErrors = require('../exceptions/api-error');
 
 class TaskService {
   async getTasks(user_id) {
     const tasks = await db.query('SELECT * FROM tasks WHERE user_id = $1', [user_id]);
-    return tasks.rows;
+
+    const result = [];
+
+    for (const task of tasks.rows) {
+      const pictureQuery = await db.query('SELECT * FROM profile_picture WHERE task_id = $1', [
+        task.id,
+      ]);
+      let picture = {};
+      // console.log('task', task.id, pictureQuery.rows[0]);
+      console.log('check', pictureQuery.rows.length != 0);
+      if (pictureQuery.rows.length != 0) {
+        console.log('zashel');
+        picture = {
+          ...pictureQuery.rows[0],
+          url: `${process.env.API_URL}/files${pictureQuery.rows[0].file_path}`,
+        };
+      }
+      const attachmentsQuery = await db.query('SELECT * FROM attachments WHERE task_id = $1', [
+        task.id,
+      ]);
+
+      let attachments = [];
+
+      for (const attachment of attachmentsQuery.rows) {
+        let attachmentInc = {
+          ...attachment,
+          url: `${process.env.API_URL}/files${attachment.rows[0].file_path}`,
+        };
+        attachments.push(attachmentInc);
+      }
+
+      result.push({
+        ...task,
+        picture: picture,
+        attachments: attachments,
+      });
+    }
+
+    return result;
   }
 
-  async addTask(user_id, summary, description, due_date) {
+  async getFile(filePath, filename) {
+    const fileRout = path.join(__dirname, '..', 'files', filePath, filename);
+    try {
+      const data = await fs.promises.readFile(fileRout);
+      return fileRout;
+    } catch (err) {
+      throw ApiErrors.NotFound('File not found');
+    }
+  }
+
+  async addTask(user_id, summary, description, due_date, tasks) {
     let maxOrder = await db.query(
       'SELECT MAX(order_index) FROM tasks WHERE status = 0 AND user_id = $1',
       [user_id],
@@ -56,5 +108,8 @@ class TaskService {
     }
   }
 }
+
+console.log('dirname', path.join(__dirname, '../asset'));
+console.log('check', fs.existsSync(path.join(__dirname, '../asset')));
 
 module.exports = new TaskService();
