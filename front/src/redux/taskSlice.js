@@ -1,6 +1,11 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 import { data } from '../asset/data.js';
+import { useDispatch } from 'react-redux';
+import { setAuth } from './authSlice.js';
+
+const API_URL = 'http://localhost:5000/api/';
 
 const Months = [
   { number: '01', name: 'Jan' },
@@ -17,23 +22,75 @@ const Months = [
   { number: '12', name: 'Dec' },
 ];
 
-const formatDate = (date) => {
+export const formatDate = (date) => {
   const splitDate = date.split('-');
+  const dayFormatted = splitDate[2].slice(0, 2).replace(/^0/, '');
   const monthFormatted = Months.find((month) => month.number === splitDate[1]).name;
-  const formatDate = `${splitDate[2]} ${monthFormatted}, ${splitDate[0]}`;
-  const newDate = { date: date, date_format: formatDate };
+  const formatDate = `${dayFormatted} ${monthFormatted}, ${splitDate[0]}`;
+  const newDate = { date: date.split('T')[0], date_format: formatDate };
   return newDate;
 };
 
 const initialState = {
-  tasks: data,
+  tasks: [],
   statuses: ['To Do', 'In Progress', 'Done'],
   modal: { isOpen: false, id: null, isCreating: false },
   alert: { isOpen: false, event: null },
   login: { isOpen: false, tab: null },
   idDraggingComponent: false,
   filteredTasks: data,
+  requestStatus: '',
 };
+
+export const getTasks = createAsyncThunk('task/get', async (_, { dispatch, rejectWithValue }) => {
+  try {
+    const res = await axios.get(API_URL + 'task/get', {
+      withCredentials: true,
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+    console.log('getTasks', res);
+    return res.data;
+  } catch (error) {
+    dispatch(setAuth());
+    return rejectWithValue(error.response?.data);
+  }
+});
+
+export const addTask = createAsyncThunk(
+  'task/create',
+  async (payload, { dispatch, rejectWithValue }) => {
+    console.log('payload', payload);
+    const formatData = new FormData();
+    formatData.append('summary', payload.summary);
+    formatData.append('description', payload.description);
+    formatData.append('due_date', payload.due_date);
+    formatData.append('image', payload.image);
+    // console.log('attachments', payload.attachments.files);
+    for (const file of payload.attachments) {
+      console.log(file);
+      formatData.append('attachments', file);
+    }
+
+    try {
+      const res = await axios.post(API_URL + 'task/add', formatData, {
+        withCredentials: true,
+        headers: {
+          authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log('addTask', res);
+      return res.data;
+    } catch (error) {
+      console.log('addTaskERROR', error);
+
+      // dispatch(setAuth());
+      return rejectWithValue(error.response?.data);
+    }
+  },
+);
 
 export const taskSlice = createSlice({
   name: 'tasks',
@@ -117,6 +174,39 @@ export const taskSlice = createSlice({
     setDndUpdate: (state, action) => {
       state.tasks = action.payload;
     },
+  },
+
+  extraReducers: (builder) => {
+    builder.addCase(getTasks.pending, (state) => {
+      state.requestStatus = 'pending';
+    });
+
+    builder.addCase(getTasks.fulfilled, (state, action) => {
+      state.requestStatus = 'success';
+      const newDate = action.payload.map((task) => {
+        task.due_date = formatDate(task.due_date);
+        return task;
+      });
+
+      state.tasks = newDate;
+    });
+
+    builder.addCase(getTasks.rejected, (state, action) => {
+      state.requestStatus = 'error';
+    });
+
+    builder.addCase(addTask.pending, (state) => {
+      state.requestStatus = 'pending';
+    });
+
+    builder.addCase(addTask.fulfilled, (state, action) => {
+      state.requestStatus = 'success';
+      state.tasks.push(action.payload);
+    });
+
+    builder.addCase(addTask.rejected, (state, action) => {
+      state.requestStatus = 'error';
+    });
   },
 });
 

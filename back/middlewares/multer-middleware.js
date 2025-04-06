@@ -1,27 +1,39 @@
 const multer = require('multer');
 const fs = require('fs');
+const path = require('path');
 
-module.exports = function (req, res, next) {
-  const uploadDir = path.join(__dirname, '../asset');
+const uploadDir = path.join(__dirname, '../files');
 
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      cb(null, uniqueSuffix + path.extname(file.originalname));
-    },
-  });
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    console.log('MIDDLEWARE: ', 'Middleware started', file);
+    if (file.fieldname === 'image') cb(null, path.join(uploadDir, '/taskPictures'));
+    if (file.fieldname === 'attachments') cb(null, path.join(uploadDir, '/attachments'));
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  },
+});
 
-  const upload = multer({
-    storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // Лимит 10MB на файл
-  });
+// const fileFilter = (req, file, cb) => {
+//   const allowedTypes = ['.jpg', '.jpeg', '.png', '.pdf', '.docx'];
+//   const ext = path.extname(file.originalname).toLowerCase();
+//   if (allowedTypes.includes(ext)) {
+//     cb(null, true);
+//   } else {
+//     cb(new Error('Недопустимый тип файла'), false);
+//   }
+// };
 
-  return upload;
-};
+const upload = multer({
+  storage: storage,
+  // fileFilter: fileFilter,
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
+
+module.exports = upload;

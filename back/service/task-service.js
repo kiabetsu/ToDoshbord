@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const { url } = require('inspector');
 const ApiErrors = require('../exceptions/api-error');
+const iconv = require('iconv-lite');
 
 class TaskService {
   async getTasks(user_id) {
@@ -15,13 +16,12 @@ class TaskService {
         task.id,
       ]);
       let picture = {};
-      // console.log('task', task.id, pictureQuery.rows[0]);
+
       console.log('check', pictureQuery.rows.length != 0);
       if (pictureQuery.rows.length != 0) {
-        console.log('zashel');
         picture = {
           ...pictureQuery.rows[0],
-          url: `${process.env.API_URL}/files${pictureQuery.rows[0].file_path}`,
+          url: `${process.env.API_URL}/api/files${pictureQuery.rows[0].file_path}`,
         };
       }
       const attachmentsQuery = await db.query('SELECT * FROM attachments WHERE task_id = $1', [
@@ -33,7 +33,7 @@ class TaskService {
       for (const attachment of attachmentsQuery.rows) {
         let attachmentInc = {
           ...attachment,
-          url: `${process.env.API_URL}/files${attachment.rows[0].file_path}`,
+          url: `${process.env.API_URL}/api/files${attachment.file_path}`,
         };
         attachments.push(attachmentInc);
       }
@@ -45,20 +45,23 @@ class TaskService {
       });
     }
 
+    // console.log('RESULT', result);
+
     return result;
   }
 
   async getFile(filePath, filename) {
+    console.log(filePath, filename);
     const fileRout = path.join(__dirname, '..', 'files', filePath, filename);
     try {
       const data = await fs.promises.readFile(fileRout);
       return fileRout;
     } catch (err) {
-      throw ApiErrors.NotFound('File not found');
+      throw ApiErrors.NotFound(`File '${filename}' not found`);
     }
   }
 
-  async addTask(user_id, summary, description, due_date, tasks) {
+  async addTask(user_id, summary, description, due_date, image, attachments) {
     let maxOrder = await db.query(
       'SELECT MAX(order_index) FROM tasks WHERE status = 0 AND user_id = $1',
       [user_id],
@@ -68,6 +71,22 @@ class TaskService {
       'INSERT INTO tasks (user_id, summary, description, due_date, status, order_index) VALUES ($1, $2, $3, $4, 0, $5) RETURNING *',
       [user_id, summary, description, due_date, maxOrder],
     );
+    if (image) {
+      const imageInsert = await db.query(
+        'INSERT INTO profile_picture (task_id, file_name, file_path) VALUES ($1, $2, $3) RETURNING *',
+        [newTask.rows[0].id, image.originalname, `/taskPictures/${image.savedName}`],
+      );
+    }
+    console.log(attachments);
+    if (attachments.length > 0) {
+      for (const attach of attachments) {
+        const attachmentInsert = await db.query(
+          'INSERT INTO attachments (task_id, file_name, file_path) VALUES ($1, $2, $3) RETURNING *',
+          [newTask.rows[0].id, attach.originalname, `/attachments/${attach.savedName}`],
+        );
+      }
+    }
+
     return newTask.rows[0];
   }
 

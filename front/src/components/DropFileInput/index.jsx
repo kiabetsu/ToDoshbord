@@ -2,18 +2,8 @@ import React from 'react';
 import { useDropzone } from 'react-dropzone';
 import styles from './style.module.scss';
 import { ArrowUpFromLine, X, ImagePlus } from 'lucide-react';
-import { upload } from '@testing-library/user-event/dist/upload';
-import { useSelector, useDispatch } from 'react-redux';
-import { setRemoveAttachment, setUploadAttachment } from '../../redux/taskSlice';
-import pic from '../../asset/Image.png';
-
+import { formatDate } from '../../redux/taskSlice';
 export function DropFileInput({ fileList, setFileList }) {
-  // const [fileList, setFileList] = React.useState([]);
-  const [shouldUpdate, isShouldUploaded] = React.useState(false);
-  const [preview, setPreview] = React.useState([]);
-  // const { data } = useSelector((state) => state.task);
-  const dispatch = useDispatch();
-
   const getDate = (date) => {
     return `${date.getDate(date)}.${date.getMonth(date) + 1}.${date.getFullYear(
       date,
@@ -21,16 +11,16 @@ export function DropFileInput({ fileList, setFileList }) {
   };
 
   const onDrop = React.useCallback((acceptedFiles) => {
-    // const testTransform = new FileReader(acceptedFiles[0]);
-
-    // dispatch(setUploadAttachment({ id: id, acceptedFiles: acceptedFiles }));
     const newFile = acceptedFiles[0];
-    newFile['uploadTime'] = { dateFormat: Date(Date.now()), stringFormat: getDate(new Date()) };
+    const today = new Date();
+    newFile['uploaded_at'] = today.toISOString();
+    console.log('eta tvar vivodit', newFile.uploaded_at);
+    newFile['file_name'] = newFile.name;
     newFile['id'] = fileList.length > 0 ? fileList.at(-1).id + 1 : 0;
     const file = new FileReader();
     file.readAsDataURL(acceptedFiles[0]);
     file.onload = function () {
-      newFile['preview'] = file.result;
+      newFile['url'] = file.result;
       if (newFile) {
         const updatedList = [...fileList, newFile];
         setFileList(updatedList);
@@ -43,7 +33,6 @@ export function DropFileInput({ fileList, setFileList }) {
       return file.id !== item.id;
     });
     setFileList(uploadFileList);
-    // dispatch(setRemoveAttachment({ id: id, item: item }));
   };
 
   const nameCat = (name) => {
@@ -96,11 +85,12 @@ export function DropFileInput({ fileList, setFileList }) {
               <span className={styles.previewTitle}>Files</span>
               {fileList.map((item, index) => (
                 <div key={index} className={styles.previewBlock}>
-                  <img src={item.preview} alt="" />
+                  <img src={item.url} alt="" />
                   <div className={styles.previewInfo}>
-                    <span className={styles.previewName}>{nameCat(item.name)}</span>
+                    <span className={styles.previewName}>{nameCat(item.file_name)}</span>
                     <span className={styles.MoreInfo}>
-                      Upload at {item.uploadTime.stringFormat} • {fileSize(item.size)}
+                      Upload at {formatDate(item.uploaded_at).date_format} •
+                      {/* {fileSize(item.size)} */}
                     </span>
                   </div>
                   <span
@@ -134,24 +124,19 @@ export function DropFileInput({ fileList, setFileList }) {
 }
 
 export const ImgUpload = ({ image, setImage }) => {
-  // const [image, setImage] = React.useState();
-
   const onDrop = React.useCallback((acceptedFiles, e) => {
-    // const testTransform = new FileReader(acceptedFiles[0]);
-
-    const img = new Image();
-    const obj = URL.createObjectURL(acceptedFiles[0]);
+    const newImg = acceptedFiles[0];
     const file = new FileReader();
     file.readAsDataURL(acceptedFiles[0]);
     file.onload = function () {
-      const newImg = file.result;
+      newImg['preview'] = file.result;
       if (newImg) {
         setImage(newImg);
       }
     };
   });
 
-  const { getRootProps, getInputProps, isDragActive, isDragAccept } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { 'image/png': ['.png', '.jpg', '.gif', '.web'] },
   });
@@ -167,12 +152,11 @@ export const ImgUpload = ({ image, setImage }) => {
     }
     return 0;
   };
-
   return (
     <>
       <div {...getRootProps()}>
         <input {...getInputProps()} />
-        {image && <img src={image} alt="Picture" />}
+        {image && <img src={typeof image === 'string' ? image : image.preview} alt="Picture" />}
         <div
           className={styles.changeImg}
           onMouseOver={() => setIsShow(1)}

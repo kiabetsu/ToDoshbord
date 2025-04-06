@@ -49,13 +49,19 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState: initialState,
   reducers: {
-    checkAuth: (state, action) => {
+    checkAuth: (state) => {
       state.isLoading = true;
       if (localStorage.getItem('token')) {
         state.isAuth = true;
         state.user = JSON.parse(localStorage.getItem('user'));
       }
       state.isLoading = false;
+    },
+    setAuth: (state) => {
+      state.isAuth = false;
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      console.log('sosite23');
     },
   },
   extraReducers: (builder) => {
@@ -96,6 +102,7 @@ export const authSlice = createSlice({
       state.status = 'success';
       state.isAuth = false;
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
     });
     builder.addCase(logout.rejected, (state) => {
       state.status = 'error';
@@ -103,6 +110,6 @@ export const authSlice = createSlice({
   },
 });
 
-export const { checkAuth } = authSlice.actions;
+export const { checkAuth, setAuth } = authSlice.actions;
 
 export default authSlice.reducer;

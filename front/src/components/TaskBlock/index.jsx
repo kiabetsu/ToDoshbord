@@ -12,7 +12,7 @@ import emj2 from '../../asset/Emoji reaction (1).svg';
 import { setModal } from '../../redux/taskSlice';
 
 export const TaskBlock = ({
-  image,
+  picture,
   summary,
   description,
   due_date,
@@ -31,29 +31,17 @@ export const TaskBlock = ({
     dispatch(setModal({ isOpen: true, id: id }));
   };
 
-  const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
+  const { setNodeRef, attributes, listeners, transform, transition } = useSortable({
     id: id,
     data: {
       type: 'task',
-      // summary,
-      // description,
-      // due_date,
-      // status,
-      // order_index,
-      // image,
     },
-    // disabled: openModalWindow,
   });
 
   const style = {
     transition,
     transform: CSS.Translate.toString(transform),
-    // height: setNodeRef.,
   };
-
-  // if (isDragging) {
-  //   return <div ref={setNodeRef} style={style} className={styles.draggingSkeleton}></div>;
-  // }
 
   return (
     <div
@@ -61,12 +49,13 @@ export const TaskBlock = ({
       style={style}
       {...attributes}
       {...listeners}
-      // className={isDragging ? styles.draggingSkeleton : styles.task}
       className={styles.task}
       onClick={(e) => {
         openModalWindow(e);
       }}>
-      <div className={styles.img}>{image && <img src={image} alt="Picture" />}</div>
+      <div className={styles.img}>
+        {typeof picture?.url !== 'undefined' && <img src={picture.url} alt="Picture" />}
+      </div>
       <div className={styles.title}>
         <div className={styles.taskTitle}>
           <h4>{summary}</h4>

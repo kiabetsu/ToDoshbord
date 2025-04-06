@@ -18,7 +18,7 @@ import { AlertModal } from '../AlertModal';
 import { ImgUpload, DropFileInput } from '../DropFileInput';
 import styles from './styles.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import { setModal, setData, createTask, setAlert } from '../../redux/taskSlice';
+import { setModal, setData, createTask, setAlert, addTask, getTasks } from '../../redux/taskSlice';
 
 import { TaskModalField } from '../TaskModalField';
 
@@ -36,7 +36,7 @@ export const TaskModal = () => {
     '-' +
     String(today.getDate()).padStart(2, '0');
 
-  const [editedPic, setEditedPic] = React.useState(data ? data.image : null);
+  const [editedPic, setEditedPic] = React.useState(data ? data.picture.url : null);
   const [isLoaded, setLoaded] = React.useState(false);
   const [editedSummary, setEditedSummary] = React.useState(data ? data.summary : '');
   const [editedDescription, setEditedDescription] = React.useState(data ? data.description : '');
@@ -46,7 +46,7 @@ export const TaskModal = () => {
 
   React.useEffect(() => {
     if ((data || modal.isCreating) && !isLoaded) {
-      setEditedPic(data ? data.image : null);
+      setEditedPic(data ? data.picture.url : null);
       setEditedSummary(data ? data.summary : '');
       setEditedDescription(data ? data.description : '');
       setEditedDueDate(data ? data.due_date.date : currentDate);
@@ -61,7 +61,7 @@ export const TaskModal = () => {
     e.stopPropagation();
 
     if (
-      (editedPic !== data.image ||
+      (editedPic !== data.picture?.url ||
         editedSummary !== data.summary ||
         editedDescription !== data.description ||
         editedDueDate !== data.due_date.date ||
@@ -83,7 +83,7 @@ export const TaskModal = () => {
   React.useEffect(() => {
     const handleClick = (e) => {
       if (modal.isOpen === false || alert.isOpen) return;
-      if (e.target.className.includes('rejectButton')) return;
+      // if (e.target.className.includes('rejectButton')) return;
       if (!modalRef.current.contains(e.target)) {
         closeModal(e, 'close');
       }
@@ -96,15 +96,15 @@ export const TaskModal = () => {
 
   const onCreateTask = (summary, description, due_date, attachments, pic) => {
     dispatch(
-      createTask({
-        summary: summary,
-        description: description,
-        due_date: due_date,
-        attachments: attachments,
-        pic: pic,
+      addTask({
+        summary: editedSummary,
+        description: editedDescription,
+        due_date: editedDueDate,
+        attachments: editedAttachments,
+        image: editedPic,
       }),
-      dispatch(setModal({ isOpen: false, id: null, isCreating: false })),
     );
+    dispatch(setModal({ isOpen: false, id: null, isCreating: false }));
   };
 
   const onConfirm = (summary, description, due_date, attachments, pic) => {
@@ -118,7 +118,8 @@ export const TaskModal = () => {
           attachments: attachments,
           pic: pic,
         }),
-        dispatch(setModal({ isOpen: false, id: null, isCreating: false })),
+        setModal({ isOpen: false, id: null, isCreating: false }),
+        getTasks(),
       );
       setLoaded(false);
     } else {
@@ -133,8 +134,24 @@ export const TaskModal = () => {
   const buttonRow = modal.isCreating ? (
     <button
       className={styles.createButton}
-      onClick={() =>
-        onCreateTask(editedSummary, editedDescription, editedDueDate, editedAttachments, editedPic)
+      onClick={
+        () =>
+          onCreateTask(
+            editedSummary,
+            editedDescription,
+            editedDueDate,
+            editedAttachments,
+            editedPic,
+          )
+        // dispatch(
+        //   addTask({
+        //     summary: editedSummary,
+        //     description: editedDescription,
+        //     due_date: editedDueDate,
+        //     attachments: editedAttachments,
+        //     image: editedPic,
+        //   }),
+        // )
       }>
       <Plus size={20} />
       &nbsp;Create

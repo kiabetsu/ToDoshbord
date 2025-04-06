@@ -90,6 +90,12 @@
   overflow: scroll;
   max-height: 600px;
   width: 992px;
+  -ms-overflow-style: none; /* IE и Edge */
+  scrollbar-width: none; /* Firefox */
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .exit {

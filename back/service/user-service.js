@@ -32,7 +32,7 @@ class UserService {
   async login(username, password) {
     const user = await findUser(username);
     if (!user) {
-      throw ApiErrors.BadRequest('User with that username is not found');
+      throw ApiErrors.BadRequest(`User with username '${username}' is not found`);
     }
     const isPassEquals = await bcrypt.compare(password, user.password);
 
