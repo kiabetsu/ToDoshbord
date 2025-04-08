@@ -24,8 +24,10 @@ router.post(
 router.put(
   '/task/update',
   authMiddleware,
-  // multerMiddleware.array('attaches'),
-  // multerMiddleware.array('picture'),
+  upload.fields([
+    { name: 'image', maxCount: 1 },
+    { name: 'attachments', maxCount: 5 },
+  ]),
   taskController.updateTask,
 );
 router.delete('/task/delete', authMiddleware, taskController.deleteTask);

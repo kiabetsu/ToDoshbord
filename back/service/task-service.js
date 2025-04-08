@@ -90,12 +90,35 @@ class TaskService {
     return newTask.rows[0];
   }
 
-  async updateTask(id, summary, description, due_date) {
+  async updateTask(id, summary, description, due_date, image, attachments) {
     if (!id) throw new Error('Id wasn`t sand');
+    console.log('vivod props', id, summary, description, due_date, image, attachments);
     const updatedTask = await db.query(
       'UPDATE tasks SET summary = $1, description = $2, due_date = $3 WHERE id = $4 RETURNING *',
       [summary, description, due_date, id],
     );
+    if (image) {
+      const deleteOldImage = await db.query(
+        'DELETE FROM profile_picture WHERE task_id = $1 RETURNING *',
+        [id],
+      );
+      const imageInsert = await db.query(
+        'INSERT INTO profile_picture (task_id, file_name, file_path) VALUES ($1, $2, $3) RETURNING *',
+        [id, image.originalname, `/taskPictures/${image.savedName}`],
+      );
+    }
+    if (attachments.length > 0) {
+      const deleteOldAttachments = await db.query(
+        'DELETE FROM attachments WHERE task_id = $1 RETURNING *',
+        [id],
+      );
+      for (const attach of attachments) {
+        const attachmentInsert = await db.query(
+          'INSERT INTO attachments (task_id, file_name, file_path) VALUES ($1, $2, $3) RETURNING *',
+          [id, attach.originalname, `/attachments/${attach.savedName}`],
+        );
+      }
+    }
     return updatedTask.rows[0];
   }
 

@@ -13,6 +13,7 @@ function App() {
   const dispatch = useDispatch();
 
   React.useEffect(() => {
+    console.log('ploho');
     dispatch(checkAuth());
     if (isAuth) dispatch(getTasks());
   }, [isAuth]);

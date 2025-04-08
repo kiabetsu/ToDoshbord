@@ -16,7 +16,7 @@ import { TaskModal } from '../../components/TaskModal';
 import { Header } from '../../components/Header';
 import { ColumnBlockRefactor } from '../../components/ColumnBlock';
 import { TaskBlock } from '../../components/TaskBlock';
-import { setDndUpdate } from '../../redux/taskSlice';
+import { getTasks, setDndUpdate } from '../../redux/taskSlice';
 
 export const PersonalDashboard = () => {
   const { statuses, tasks, filteredTasks } = useSelector((state) => state.tasks);
@@ -98,6 +98,7 @@ export const PersonalDashboard = () => {
       <TaskModal />
       <Header />
       <div className={styles.main}>
+        <button onClick={() => dispatch(getTasks())}>check rerenders</button>
         <h2>Road map</h2>
         <DndContext
           collisionDetection={closestCenter}

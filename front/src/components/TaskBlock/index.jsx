@@ -1,6 +1,6 @@
 import React from 'react';
 import { CalendarDays, Paperclip } from 'lucide-react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import TextareaAutosize from 'react-textarea-autosize';
@@ -21,6 +21,7 @@ export const TaskBlock = ({
   order_index,
   attachments,
 }) => {
+  const { modal } = useSelector((state) => state.tasks);
   const dispatch = useDispatch();
 
   let currentDate = new Date();
@@ -49,7 +50,7 @@ export const TaskBlock = ({
       style={style}
       {...attributes}
       {...listeners}
-      className={styles.task}
+      className={`${styles.task} ${modal.isOpen && styles.modalOpen} `}
       onClick={(e) => {
         openModalWindow(e);
       }}>

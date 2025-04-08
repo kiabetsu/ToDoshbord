@@ -26,7 +26,6 @@ class taskController {
   async addTask(req, res, next) {
     try {
       const user_id = req.user.id;
-      console.log('FILES!!!!!!!!!!', req.files);
       const image = req.files['image']
         ? {
             originalname: req.files['image'][0].originalname,
@@ -38,8 +37,6 @@ class taskController {
             return { originalname: file.originalname, savedName: file.filename };
           })
         : [];
-      console.log('attachmentsasdfsdfgsdfgsdfgsdfgsdfg', attachments);
-
       const { summary, description, due_date } = req.body;
       const task = await TaskService.addTask(
         user_id,
@@ -49,7 +46,6 @@ class taskController {
         image,
         attachments,
       );
-      // const taskResponse = { ...task, image, attachments };
       return res.json({ massage: 'Task added successfully' });
     } catch (error) {
       next(error);
@@ -59,8 +55,26 @@ class taskController {
   async updateTask(req, res, next) {
     try {
       const { id, summary, description, due_date } = req.body;
-      const task = await TaskService.updateTask(id, summary, description, due_date);
-      return res.json(task);
+      const image = req.files['image']
+        ? {
+            originalname: req.files['image'][0].originalname,
+            savedName: req.files['image'][0].filename,
+          }
+        : null;
+      const attachments = req.files['attachments']
+        ? req.files['attachments'].map((file) => {
+            return { originalname: file.originalname, savedName: file.filename };
+          })
+        : [];
+      const task = await TaskService.updateTask(
+        id,
+        summary,
+        description,
+        due_date,
+        image,
+        attachments,
+      );
+      return res.json({ massage: 'Task updated successfully' });
     } catch (error) {
       next(error);
     }

@@ -18,7 +18,15 @@ import { AlertModal } from '../AlertModal';
 import { ImgUpload, DropFileInput } from '../DropFileInput';
 import styles from './styles.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import { setModal, setData, createTask, setAlert, addTask, getTasks } from '../../redux/taskSlice';
+import {
+  setModal,
+  setData,
+  createTask,
+  setAlert,
+  addTask,
+  getTasks,
+  updateTask,
+} from '../../redux/taskSlice';
 
 import { TaskModalField } from '../TaskModalField';
 
@@ -97,30 +105,29 @@ export const TaskModal = () => {
   const onCreateTask = (summary, description, due_date, attachments, pic) => {
     dispatch(
       addTask({
-        summary: editedSummary,
-        description: editedDescription,
-        due_date: editedDueDate,
-        attachments: editedAttachments,
-        image: editedPic,
+        summary: summary,
+        description: description,
+        due_date: due_date,
+        attachments: attachments,
+        image: pic,
       }),
     );
     dispatch(setModal({ isOpen: false, id: null, isCreating: false }));
   };
 
-  const onConfirm = (summary, description, due_date, attachments, pic) => {
+  const onConfirm = (id, summary, description, due_date, attachments, pic) => {
     if (summary) {
       dispatch(
-        setData({
-          id: data.id,
+        updateTask({
+          id: id,
           summary: summary,
           description: description,
           due_date: due_date,
           attachments: attachments,
-          pic: pic,
+          image: pic,
         }),
-        setModal({ isOpen: false, id: null, isCreating: false }),
-        getTasks(),
       );
+      dispatch(setModal({ isOpen: false, id: null, isCreating: false }));
       setLoaded(false);
     } else {
       setRequiredField(true);
@@ -134,24 +141,8 @@ export const TaskModal = () => {
   const buttonRow = modal.isCreating ? (
     <button
       className={styles.createButton}
-      onClick={
-        () =>
-          onCreateTask(
-            editedSummary,
-            editedDescription,
-            editedDueDate,
-            editedAttachments,
-            editedPic,
-          )
-        // dispatch(
-        //   addTask({
-        //     summary: editedSummary,
-        //     description: editedDescription,
-        //     due_date: editedDueDate,
-        //     attachments: editedAttachments,
-        //     image: editedPic,
-        //   }),
-        // )
+      onClick={() =>
+        onCreateTask(editedSummary, editedDescription, editedDueDate, editedAttachments, editedPic)
       }>
       <Plus size={20} />
       &nbsp;Create
@@ -161,7 +152,14 @@ export const TaskModal = () => {
       <button
         className={styles.editButton}
         onClick={() =>
-          onConfirm(editedSummary, editedDescription, editedDueDate, editedAttachments, editedPic)
+          onConfirm(
+            data.id,
+            editedSummary,
+            editedDescription,
+            editedDueDate,
+            editedAttachments,
+            editedPic,
+          )
         }>
         <Pencil size={20} />
         &nbsp;Confirm

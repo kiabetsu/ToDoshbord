@@ -10,6 +10,8 @@
   width: auto;
   padding: 0;
   margin: 0;
+  height: 100%;
+  // overflow: hidden;
 }
 
 .App-logo {
@@ -47,13 +49,14 @@
   display: flex;
   justify-content: center;
   flex-direction: column;
+  height: 100vh;
 
-  > .content {
+  .content {
     display: flex;
     gap: 20px;
   }
 
-  > h2 {
+  h2 {
     text-align: start;
   }
 }

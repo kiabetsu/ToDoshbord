@@ -61,13 +61,12 @@ export const getTasks = createAsyncThunk('task/get', async (_, { dispatch, rejec
 export const addTask = createAsyncThunk(
   'task/create',
   async (payload, { dispatch, rejectWithValue }) => {
-    console.log('payload', payload);
     const formatData = new FormData();
     formatData.append('summary', payload.summary);
     formatData.append('description', payload.description);
     formatData.append('due_date', payload.due_date);
     formatData.append('image', payload.image);
-    console.log('attachments', payload.attachments.files);
+    // console.log('attachments', payload.attachments.files);
     for (const file of payload.attachments) {
       console.log(file);
       formatData.append('attachments', file);
@@ -81,11 +80,39 @@ export const addTask = createAsyncThunk(
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log('addTask', res);
+      dispatch(getTasks());
       return res.data;
     } catch (error) {
       console.log('addTaskERROR', error);
+      // dispatch(setAuth());
+      return rejectWithValue(error.response?.data);
+    }
+  },
+);
 
+export const updateTask = createAsyncThunk(
+  'task/update',
+  async (payload, { dispatch, rejectWithValue }) => {
+    const formatData = new FormData();
+    formatData.append('id', payload.id);
+    formatData.append('summary', payload.summary);
+    formatData.append('description', payload.description);
+    formatData.append('due_date', payload.due_date);
+    formatData.append('image', payload.image);
+    for (const file of payload.attachments) {
+      formatData.append('attachments', file);
+    }
+    console.log('VIVOD FORMDATA', formatData.getAll('attachments'));
+    try {
+      const res = await axios.put(API_URL + 'task/update', formatData, {
+        withCredentials: true,
+        headers: {
+          authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      dispatch(getTasks());
+    } catch (error) {
       // dispatch(setAuth());
       return rejectWithValue(error.response?.data);
     }
@@ -134,18 +161,18 @@ export const taskSlice = createSlice({
       }
     },
 
-    createTask: (state, action) => {
-      const newTask = {};
-      newTask['id'] = state.tasks[state.tasks.length - 1].id + 1;
-      newTask['status'] = 0;
-      newTask['image'] = action.payload.pic;
-      newTask['summary'] = action.payload.summary;
-      newTask['description'] = action.payload.description;
-      newTask['due_date'] = formatDate(action.payload.due_date);
-      newTask['attachments'] = action.payload.attachments;
+    // createTask: (state, action) => {
+    //   const newTask = {};
+    //   newTask['id'] = state.tasks[state.tasks.length - 1].id + 1;
+    //   newTask['status'] = 0;
+    //   newTask['image'] = action.payload.pic;
+    //   newTask['summary'] = action.payload.summary;
+    //   newTask['description'] = action.payload.description;
+    //   newTask['due_date'] = formatDate(action.payload.due_date);
+    //   newTask['attachments'] = action.payload.attachments;
 
-      state.tasks.push(newTask);
-    },
+    //   state.tasks.push(newTask);
+    // },
 
     setRemoveTask: (state, action) => {
       state.tasks = state.tasks.filter((task) => task.id !== action.payload.id);
@@ -201,10 +228,21 @@ export const taskSlice = createSlice({
 
     builder.addCase(addTask.fulfilled, (state, action) => {
       state.requestStatus = 'success';
-      state.tasks.push(action.payload);
+      console.log('action', action);
     });
 
     builder.addCase(addTask.rejected, (state, action) => {
+      state.requestStatus = 'error';
+    });
+
+    builder.addCase(updateTask.pending, (state) => {
+      state.requestStatus = 'pending';
+    });
+    builder.addCase(updateTask.fulfilled, (state) => {
+      state.requestStatus = 'success';
+      // state.
+    });
+    builder.addCase(updateTask.rejected, (state) => {
       state.requestStatus = 'error';
     });
   },
@@ -222,7 +260,7 @@ export const {
   setOrderIndex,
   setUploadAttachment,
   setRemoveAttachment,
-  createTask,
+  // createTask,
   setRemoveTask,
   setTasksFilter,
   setDndUpdate,

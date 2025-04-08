@@ -47,7 +47,8 @@
     position: absolute;
     top: 0;
     margin: 10px;
-    width: 982px;
+    box-sizing: border-box;
+    width: 1012px;
     height: 170px;
     border: 5px dashed #5ba9e9;
     border-radius: 16px;
@@ -88,8 +89,9 @@
   gap: 1em;
   box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.3);
   overflow: scroll;
+  box-sizing: border-box;
   max-height: 600px;
-  width: 992px;
+  width: 1012px;
   -ms-overflow-style: none; /* IE и Edge */
   scrollbar-width: none; /* Firefox */
 
