@@ -67,7 +67,7 @@ export const addTask = createAsyncThunk(
     formatData.append('description', payload.description);
     formatData.append('due_date', payload.due_date);
     formatData.append('image', payload.image);
-    // console.log('attachments', payload.attachments.files);
+    console.log('attachments', payload.attachments.files);
     for (const file of payload.attachments) {
       console.log(file);
       formatData.append('attachments', file);
