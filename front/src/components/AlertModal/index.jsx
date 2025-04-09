@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import styles from './styles.module.scss';
 import { ModalRefactored } from '../Modal';
-import { setAlert, setModal, setRemoveTask } from '../../redux/taskSlice';
+import { deleteTask, setAlert, setModal, setRemoveTask } from '../../redux/taskSlice';
 
 export const AlertModal = ({ id }) => {
   const { alert } = useSelector((state) => state.tasks);
@@ -20,7 +20,7 @@ export const AlertModal = ({ id }) => {
   };
 
   const RemoveTask = () => {
-    dispatch(setRemoveTask({ id: id }));
+    dispatch(deleteTask({ id: id }));
   };
 
   const confirmCloseModal = () => {

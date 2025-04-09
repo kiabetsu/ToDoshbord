@@ -92,12 +92,28 @@ class TaskService {
 
   async updateTask(id, summary, description, due_date, image, attachments) {
     if (!id) throw new Error('Id wasn`t sand');
-    console.log('vivod props', id, summary, description, due_date, image, attachments);
     const updatedTask = await db.query(
       'UPDATE tasks SET summary = $1, description = $2, due_date = $3 WHERE id = $4 RETURNING *',
       [summary, description, due_date, id],
     );
+
+    //update task image
     if (image) {
+      const chooseOldImage = await db.query('SELECT * FROM profile_picture where task_id = $1 ', [
+        id,
+      ]);
+
+      if (chooseOldImage.rows.length) {
+        const filePath = path.join(__dirname, '..', 'files', chooseOldImage.rows[0].file_path);
+
+        try {
+          await fs.promises.access(filePath);
+        } catch {
+          throw new Error('File not found');
+        }
+        await fs.promises.unlink(filePath);
+      }
+
       const deleteOldImage = await db.query(
         'DELETE FROM profile_picture WHERE task_id = $1 RETURNING *',
         [id],
@@ -107,11 +123,25 @@ class TaskService {
         [id, image.originalname, `/taskPictures/${image.savedName}`],
       );
     }
+
+    //update task attachments
+    const chooseOldAttachments = await db.query('SELECT * FROM attachments WHERE task_id = $1', [
+      id,
+    ]);
+    if (chooseOldAttachments.rows.length) {
+      for (const attachmentNote of chooseOldAttachments.rows) {
+        const filePath = path.join(__dirname, '..', 'files', attachmentNote.file_path);
+        try {
+          await fs.promises.access(filePath);
+        } catch {
+          return res.status(404).json({ error: 'File not found' });
+        }
+        await fs.promises.unlink(filePath);
+      }
+    }
+
+    const deleteOldAttachments = await db.query('DELETE FROM attachments WHERE task_id = $1', [id]);
     if (attachments.length > 0) {
-      const deleteOldAttachments = await db.query(
-        'DELETE FROM attachments WHERE task_id = $1 RETURNING *',
-        [id],
-      );
       for (const attach of attachments) {
         const attachmentInsert = await db.query(
           'INSERT INTO attachments (task_id, file_name, file_path) VALUES ($1, $2, $3) RETURNING *',
@@ -129,6 +159,39 @@ class TaskService {
     const status = taskData.rows[0].status;
     const orderIndex = taskData.rows[0].order_index;
     const user_id = taskData.rows[0].user_id;
+
+    //delete files
+    //delete task image
+    const chooseOldImage = await db.query('SELECT * FROM profile_picture where task_id = $1 ', [
+      id,
+    ]);
+    if (chooseOldImage.rows.length) {
+      const filePath = path.join(__dirname, '..', 'files', chooseOldImage.rows[0].file_path);
+
+      try {
+        await fs.promises.access(filePath);
+      } catch {
+        return res.status(404).json({ error: 'File not found' });
+      }
+      await fs.promises.unlink(filePath);
+    }
+
+    //delete task attachments
+    const chooseOldAttachments = await db.query('SELECT * FROM attachments WHERE task_id = $1 ', [
+      id,
+    ]);
+    if (chooseOldAttachments.rows.length) {
+      for (const attachmentNote of chooseOldAttachments.rows) {
+        const filePath = path.join(__dirname, '..', 'files', attachmentNote.file_path);
+        try {
+          await fs.promises.access(filePath);
+        } catch {
+          return res.status(404).json({ error: 'File not found' });
+        }
+        await fs.promises.unlink(filePath);
+      }
+    }
+
     const deletedTask = await db.query('DELETE FROM tasks WHERE id = $1 RETURNING *', [id]);
     await db.query(
       `UPDATE tasks SET order_index = order_index - 1 WHERE order_index > $1 AND status = $2 AND user_id = $3`,

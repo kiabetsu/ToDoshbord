@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 import { data } from '../asset/data.js';
-import { useDispatch } from 'react-redux';
 import { setAuth } from './authSlice.js';
 
 const API_URL = 'http://localhost:5000/api/';
@@ -66,7 +65,6 @@ export const addTask = createAsyncThunk(
     formatData.append('description', payload.description);
     formatData.append('due_date', payload.due_date);
     formatData.append('image', payload.image);
-    // console.log('attachments', payload.attachments.files);
     for (const file of payload.attachments) {
       console.log(file);
       formatData.append('attachments', file);
@@ -102,7 +100,6 @@ export const updateTask = createAsyncThunk(
     for (const file of payload.attachments) {
       formatData.append('attachments', file);
     }
-    console.log('VIVOD FORMDATA', formatData.getAll('attachments'));
     try {
       const res = await axios.put(API_URL + 'task/update', formatData, {
         withCredentials: true,
@@ -114,6 +111,28 @@ export const updateTask = createAsyncThunk(
       dispatch(getTasks());
     } catch (error) {
       // dispatch(setAuth());
+      return rejectWithValue(error.response?.data);
+    }
+  },
+);
+
+export const deleteTask = createAsyncThunk(
+  'task/delete',
+  async (payload, { dispatch, rejectWithValue }) => {
+    try {
+      console.log('payload', payload.id);
+      const res = await axios.post(
+        API_URL + 'task/delete',
+        { id: payload.id },
+        {
+          withCredentials: true,
+          headers: {
+            authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        },
+      );
+      dispatch(getTasks());
+    } catch (error) {
       return rejectWithValue(error.response?.data);
     }
   },
@@ -228,7 +247,6 @@ export const taskSlice = createSlice({
 
     builder.addCase(addTask.fulfilled, (state, action) => {
       state.requestStatus = 'success';
-      console.log('action', action);
     });
 
     builder.addCase(addTask.rejected, (state, action) => {
@@ -240,9 +258,18 @@ export const taskSlice = createSlice({
     });
     builder.addCase(updateTask.fulfilled, (state) => {
       state.requestStatus = 'success';
-      // state.
     });
     builder.addCase(updateTask.rejected, (state) => {
+      state.requestStatus = 'error';
+    });
+
+    builder.addCase(deleteTask.pending, (state) => {
+      state.requestStatus = 'pending';
+    });
+    builder.addCase(deleteTask.fulfilled, (state) => {
+      state.requestStatus = 'success';
+    });
+    builder.addCase(deleteTask.rejected, (state) => {
       state.requestStatus = 'error';
     });
   },

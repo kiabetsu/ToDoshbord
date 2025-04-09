@@ -30,7 +30,7 @@ router.put(
   ]),
   taskController.updateTask,
 );
-router.delete('/task/delete', authMiddleware, taskController.deleteTask);
+router.post('/task/delete', authMiddleware, taskController.deleteTask);
 router.post('/task/dndChange', authMiddleware, taskController.dndChange);
 
 module.exports = router;
