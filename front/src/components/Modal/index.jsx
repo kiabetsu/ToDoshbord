@@ -4,15 +4,15 @@ import styles from './style.module.scss';
 import { useSelector } from 'react-redux';
 
 export const ModalRefactored = ({ modalType, children }) => {
-  const { modal, alert, login } = useSelector((state) => state.tasks);
+  const { modal, confirm, login } = useSelector((state) => state.tasks);
 
   let toggle;
   switch (modalType) {
     case 'task':
       toggle = modal.isOpen;
       break;
-    case 'alert':
-      toggle = alert.isOpen;
+    case 'confirm':
+      toggle = confirm.isOpen;
       break;
     case 'login':
       toggle = login.isOpen;
@@ -28,8 +28,8 @@ export const ModalRefactored = ({ modalType, children }) => {
         style={{
           opacity: `${toggle ? 1 : 0}`,
           pointerEvents: `${toggle ? 'all' : 'none'}`,
-          zIndex: `${modalType === 'alert' ? 11 : 0}`,
-          top: `${modalType === 'alert' ? '134%' : '50%'}`,
+          zIndex: `${modalType === 'confirm' ? 11 : 0}`,
+          top: `${modalType === 'confirm' ? '134%' : '50%'}`,
         }}
       />
       <div
@@ -37,7 +37,7 @@ export const ModalRefactored = ({ modalType, children }) => {
         style={{
           transform: `translate(-50%, -50%) ${toggle ? 'scale(1)' : 'scale(0)'}`,
           opacity: `${toggle ? 1 : 0}`,
-          zIndex: `${modalType === 'alert' ? 12 : 0}`,
+          zIndex: `${modalType === 'confirm' ? 12 : 0}`,
         }}>
         <div className={styles.modal}>{children}</div>
       </div>

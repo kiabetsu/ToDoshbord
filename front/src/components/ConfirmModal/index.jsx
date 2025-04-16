@@ -3,16 +3,16 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import styles from './styles.module.scss';
 import { ModalRefactored } from '../Modal';
-import { deleteTask, setAlert, setModal, setRemoveTask } from '../../redux/taskSlice';
+import { deleteTask, setConfirm, setModal, setRemoveTask } from '../../redux/taskSlice';
 
-export const AlertModal = ({ id }) => {
-  const { alert } = useSelector((state) => state.tasks);
+export const ConfirmModal = ({ id }) => {
+  const { confirm } = useSelector((state) => state.tasks);
   const dispatch = useDispatch();
 
-  const alertRef = React.useRef();
+  const ConfirmRef = React.useRef();
 
-  const closeAlert = () => {
-    dispatch(setAlert({ isOpen: false, event: null }));
+  const closeConfirm = () => {
+    dispatch(setConfirm({ isOpen: false, event: null }));
   };
 
   const closeModal = () => {
@@ -24,21 +24,21 @@ export const AlertModal = ({ id }) => {
   };
 
   const confirmCloseModal = () => {
-    closeAlert();
+    closeConfirm();
     closeModal();
   };
 
   const confirmRemoveTask = () => {
     RemoveTask(id);
-    closeAlert();
+    closeConfirm();
     closeModal();
   };
 
   React.useEffect(() => {
     const handleClick = (e) => {
-      if (!alert.isOpen) return;
-      if (!alertRef.current.contains(e.target)) {
-        closeAlert();
+      if (!confirm.isOpen) return;
+      if (!ConfirmRef.current.contains(e.target)) {
+        closeConfirm();
       }
     };
     document.addEventListener('click', handleClick);
@@ -50,7 +50,7 @@ export const AlertModal = ({ id }) => {
   let massage;
   let acceptButton;
 
-  switch (alert.event) {
+  switch (confirm.event) {
     case 'close':
       massage = 'If you close the window, the changes will not be saved. Close?';
       acceptButton = 'Close';
@@ -65,21 +65,21 @@ export const AlertModal = ({ id }) => {
   }
 
   return (
-    <ModalRefactored modalType="alert">
-      <div ref={alertRef} className={styles.alert}>
-        <span className={styles.alertText}>{massage}</span>
+    <ModalRefactored modalType="confirm">
+      <div ref={ConfirmRef} className={styles.confirm}>
+        <span className={styles.confirmText}>{massage}</span>
         <div className={styles.buttonLine}>
-          {alert.event === 'close' && (
+          {confirm.event === 'close' && (
             <button className={styles.acceptButton} onClick={() => confirmCloseModal()}>
               {acceptButton}
             </button>
           )}
-          {alert.event === 'remove' && (
+          {confirm.event === 'remove' && (
             <button className={styles.acceptButton} onClick={() => confirmRemoveTask()}>
               {acceptButton}
             </button>
           )}
-          <button className={styles.rejectButton} onClick={() => closeAlert()}>
+          <button className={styles.rejectButton} onClick={() => closeConfirm()}>
             Cancel
           </button>
         </div>

@@ -46,7 +46,9 @@ class taskController {
         image,
         attachments,
       );
-      return res.json({ massage: 'Task added successfully' });
+
+      const tasks = await TaskService.getTasks(user_id);
+      return res.json({ tasks: tasks, massage: 'The task was added successfully' });
     } catch (error) {
       next(error);
     }
@@ -54,6 +56,7 @@ class taskController {
 
   async updateTask(req, res, next) {
     try {
+      const user_id = req.user.id;
       const { id, summary, description, due_date } = req.body;
       const image = req.files['image']
         ? {
@@ -74,7 +77,10 @@ class taskController {
         image,
         attachments,
       );
-      return res.json({ massage: 'Task updated successfully' });
+
+      const tasks = await TaskService.getTasks(user_id);
+
+      return res.json({ tasks: tasks, massage: 'The task was updated successfully' });
     } catch (error) {
       next(error);
     }
@@ -82,9 +88,12 @@ class taskController {
 
   async deleteTask(req, res, next) {
     try {
+      const user_id = req.user.id;
       const { id } = req.body;
       const task = await TaskService.deleteTask(id);
-      return res.json(task);
+      const tasks = await TaskService.getTasks(user_id);
+
+      return res.json({ tasks: tasks, massage: 'The task was deleted successfully' });
     } catch (error) {
       next(error);
     }
@@ -94,6 +103,7 @@ class taskController {
     try {
       const user_id = req.user.id;
       const { changes } = req.body;
+      console.log('CHANGESSSSSSS', req.body);
       await TaskService.dndChange(changes);
       const tasks = await TaskService.getTasks(user_id);
       return res.json(tasks);

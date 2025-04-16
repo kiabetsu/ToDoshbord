@@ -14,13 +14,6 @@ export function DropFileInput({ fileList, setFileList }) {
     const newFile = acceptedFiles[0];
     const today = new Date();
     newFile['uploaded_at'] = today.toISOString();
-    console.log('eta tvar vivodit', newFile.uploaded_at);
-    newFile['file_name'] = newFile.name;
-    console.log('fileList.length > 0 ?', fileList.length > 0 ? fileList.at(-1) : 0);
-    console.log(
-      'fileList.length > 0 ? fileList.at(-1).attachment_id + 1 : 0',
-      fileList.length > 0 ? fileList.at(-1).attachment_id + 1 : 0,
-    );
     newFile['attachment_id'] = fileList.length > 0 ? fileList.at(-1).attachment_id + 1 : 0;
     const file = new FileReader();
     file.readAsDataURL(acceptedFiles[0]);
@@ -28,19 +21,15 @@ export function DropFileInput({ fileList, setFileList }) {
       newFile['url'] = file.result;
       if (newFile) {
         const updatedList = [...fileList, newFile];
-        console.log('updatedList', updatedList);
         setFileList(updatedList);
       }
     };
   });
 
   const fileRemove = (item) => {
-    console.log('item', item);
-    console.log('asdfasdf', fileList);
     const updateList = fileList.filter((file) => {
       return file.attachment_id !== item.attachment_id;
     });
-    console.log(updateList);
     setFileList(updateList);
   };
 

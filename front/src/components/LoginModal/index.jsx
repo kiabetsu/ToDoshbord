@@ -1,5 +1,4 @@
 import React from 'react';
-import { Eye, EyeOff, TriangleAlert } from 'lucide-react';
 
 import styles from './styles.module.scss';
 import { login, registration } from '../../redux/authSlice';
@@ -7,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AuthField } from '../AuthField';
 
 export const LoginModal = (props) => {
-  const [passwordIsHidden, setPasswordIsHidden] = React.useState(true);
   const [isLogin, setIsLogin] = React.useState(true);
 
   const [username, setUsername] = React.useState('');
@@ -94,7 +92,6 @@ export const LoginModal = (props) => {
                   disabled={username && password ? false : true}
                   onClick={() => {
                     dispatch(login({ username: username, password: password }));
-                    console.log('i tut bil');
                     clearLoginState();
                   }}>
                   {' '}

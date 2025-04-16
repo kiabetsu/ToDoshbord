@@ -34,7 +34,7 @@ const initialState = {
   tasks: [],
   statuses: ['To Do', 'In Progress', 'Done'],
   modal: { isOpen: false, id: null, isCreating: false },
-  alert: { isOpen: false, event: null },
+  confirm: { isOpen: false, event: null },
   login: { isOpen: false, tab: null },
   idDraggingComponent: false,
   filteredTasks: data,
@@ -49,7 +49,6 @@ export const getTasks = createAsyncThunk('task/get', async (_, { dispatch, rejec
         authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     });
-    console.log('getTasks', res);
     return res.data;
   } catch (error) {
     dispatch(setAuth());
@@ -66,7 +65,6 @@ export const addTask = createAsyncThunk(
     formatData.append('due_date', payload.due_date);
     formatData.append('image', payload.image);
     for (const file of payload.attachments) {
-      console.log(file);
       formatData.append('attachments', file);
     }
 
@@ -78,10 +76,8 @@ export const addTask = createAsyncThunk(
           'Content-Type': 'multipart/form-data',
         },
       });
-      dispatch(getTasks());
       return res.data;
     } catch (error) {
-      console.log('addTaskERROR', error);
       // dispatch(setAuth());
       return rejectWithValue(error.response?.data);
     }
@@ -108,7 +104,7 @@ export const updateTask = createAsyncThunk(
           'Content-Type': 'multipart/form-data',
         },
       });
-      dispatch(getTasks());
+      return res.data;
     } catch (error) {
       // dispatch(setAuth());
       return rejectWithValue(error.response?.data);
@@ -120,7 +116,6 @@ export const deleteTask = createAsyncThunk(
   'task/delete',
   async (payload, { dispatch, rejectWithValue }) => {
     try {
-      console.log('payload', payload.id);
       const res = await axios.post(
         API_URL + 'task/delete',
         { id: payload.id },
@@ -131,7 +126,31 @@ export const deleteTask = createAsyncThunk(
           },
         },
       );
-      dispatch(getTasks());
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  },
+);
+
+export const dndChange = createAsyncThunk(
+  'task/dndChange',
+  async (payload, { dispatch, rejectWithValue }) => {
+    console.log('payload', payload);
+    const resData = {
+      changes: payload.map((task) => {
+        return { id: task.id, order_index: task.order_index, status: task.status };
+      }),
+    };
+
+    try {
+      const res = await axios.post(API_URL + 'task/dndChange', resData, {
+        withCredentials: true,
+        headers: {
+          authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      return res.data;
     } catch (error) {
       return rejectWithValue(error.response?.data);
     }
@@ -148,10 +167,10 @@ export const taskSlice = createSlice({
       state.modal.isCreating = action.payload.isCreating;
     },
 
-    setAlert: (state, action) => {
-      state.alert.isOpen = action.payload.isOpen;
+    setConfirm: (state, action) => {
+      state.confirm.isOpen = action.payload.isOpen;
 
-      state.alert.event = action.payload.event;
+      state.confirm.event = action.payload.event;
     },
 
     setLogin(state, action) {
@@ -226,17 +245,15 @@ export const taskSlice = createSlice({
     builder.addCase(getTasks.pending, (state) => {
       state.requestStatus = 'pending';
     });
-
     builder.addCase(getTasks.fulfilled, (state, action) => {
       state.requestStatus = 'success';
-      const newDate = action.payload.map((task) => {
+      const newData = action.payload.map((task) => {
         task.due_date = formatDate(task.due_date);
         return task;
       });
-
-      state.tasks = newDate;
+      console.log('task list', newData);
+      state.tasks = newData;
     });
-
     builder.addCase(getTasks.rejected, (state, action) => {
       state.requestStatus = 'error';
     });
@@ -244,11 +261,14 @@ export const taskSlice = createSlice({
     builder.addCase(addTask.pending, (state) => {
       state.requestStatus = 'pending';
     });
-
     builder.addCase(addTask.fulfilled, (state, action) => {
       state.requestStatus = 'success';
+      const newDate = action.payload.tasks.map((task) => {
+        task.due_date = formatDate(task.due_date);
+        return task;
+      });
+      state.tasks = newDate;
     });
-
     builder.addCase(addTask.rejected, (state, action) => {
       state.requestStatus = 'error';
     });
@@ -256,8 +276,13 @@ export const taskSlice = createSlice({
     builder.addCase(updateTask.pending, (state) => {
       state.requestStatus = 'pending';
     });
-    builder.addCase(updateTask.fulfilled, (state) => {
+    builder.addCase(updateTask.fulfilled, (state, action) => {
       state.requestStatus = 'success';
+      const newDate = action.payload.tasks.map((task) => {
+        task.due_date = formatDate(task.due_date);
+        return task;
+      });
+      state.tasks = newDate;
     });
     builder.addCase(updateTask.rejected, (state) => {
       state.requestStatus = 'error';
@@ -266,10 +291,31 @@ export const taskSlice = createSlice({
     builder.addCase(deleteTask.pending, (state) => {
       state.requestStatus = 'pending';
     });
-    builder.addCase(deleteTask.fulfilled, (state) => {
+    builder.addCase(deleteTask.fulfilled, (state, action) => {
       state.requestStatus = 'success';
+
+      const newDate = action.payload.tasks.map((task) => {
+        task.due_date = formatDate(task.due_date);
+        return task;
+      });
+      state.tasks = newDate;
     });
     builder.addCase(deleteTask.rejected, (state) => {
+      state.requestStatus = 'error';
+    });
+
+    builder.addCase(dndChange.pending, (state) => {
+      state.requestStatus = 'pending';
+    });
+    builder.addCase(dndChange.fulfilled, (state, action) => {
+      state.requestStatus = 'success';
+      const newDate = action.payload.map((task) => {
+        task.due_date = formatDate(task.due_date);
+        return task;
+      });
+      state.tasks = newDate;
+    });
+    builder.addCase(dndChange.rejected, (state) => {
       state.requestStatus = 'error';
     });
   },
@@ -277,7 +323,7 @@ export const taskSlice = createSlice({
 
 export const {
   setModal,
-  setAlert,
+  setConfirm,
   setLogin,
   setData,
   setDueDate,

@@ -1,0 +1,24 @@
+.alert {
+  --warning: #f95668;
+  --success: #09c97f;
+  --warning-background-color: #ffdbdb;
+  --success-background-color: #c9ffe5;
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  background-color: var(--warning-background-color);
+  border: 1px solid var(--warning);
+  border-radius: 12px;
+  color: var(--warning);
+  position: absolute;
+  bottom: 20px;
+  max-width: 500px;
+  right: 20px;
+  z-index: 1004;
+
+  .alertText {
+    text-align: start;
+  }
+}

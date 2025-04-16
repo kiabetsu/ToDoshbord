@@ -14,7 +14,7 @@ import 'react-date-picker/dist/DatePicker.css';
 import 'react-calendar/dist/Calendar.css';
 
 import { ModalRefactored } from '../Modal';
-import { AlertModal } from '../AlertModal';
+import { ConfirmModal } from '../ConfirmModal';
 import { ImgUpload, DropFileInput } from '../DropFileInput';
 import styles from './styles.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,16 +22,17 @@ import {
   setModal,
   setData,
   createTask,
-  setAlert,
+  setConfirm,
   addTask,
   getTasks,
   updateTask,
+  deleteTask,
 } from '../../redux/taskSlice';
 
 import { TaskModalField } from '../TaskModalField';
 
 export const TaskModal = () => {
-  const { modal, tasks, alert } = useSelector((state) => state.tasks);
+  const { modal, tasks, confirm } = useSelector((state) => state.tasks);
   const dispatch = useDispatch();
 
   const data = modal.id !== null && modal.isOpen && tasks.find((task) => task.id === modal.id);
@@ -85,12 +86,12 @@ export const TaskModal = () => {
   };
 
   const openConfirm = (event) => {
-    dispatch(setAlert({ isOpen: true, event: event }));
+    dispatch(setConfirm({ isOpen: true, event: event }));
   };
 
   React.useEffect(() => {
     const handleClick = (e) => {
-      if (modal.isOpen === false || alert.isOpen) return;
+      if (modal.isOpen === false || confirm.isOpen) return;
       // if (e.target.className.includes('rejectButton')) return;
       if (!modalRef.current.contains(e.target)) {
         closeModal(e, 'close');
@@ -134,8 +135,9 @@ export const TaskModal = () => {
     }
   };
 
-  const onRemoveTask = (e) => {
+  const onRemoveTask = (e, id) => {
     closeModal(e, 'remove');
+    // dispatch(deleteTask({ id: id }));
   };
 
   const buttonRow = modal.isCreating ? (
@@ -164,7 +166,7 @@ export const TaskModal = () => {
         <Pencil size={20} />
         &nbsp;Confirm
       </button>
-      <button className={styles.removeButton} onClick={(e) => onRemoveTask(e)}>
+      <button className={styles.removeButton} onClick={(e) => onRemoveTask(e, data.id)}>
         <Trash2 size={20} />
         &nbsp;Remove
       </button>
@@ -173,7 +175,7 @@ export const TaskModal = () => {
 
   return (
     <ModalRefactored modalType="task">
-      <AlertModal id={data.id} />
+      <ConfirmModal id={data?.id} />
       <span className={styles.exit}>
         <X size={24} onClick={(e) => closeModal(e, 'close')} />
       </span>

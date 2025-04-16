@@ -16,7 +16,7 @@ import { TaskModal } from '../../components/TaskModal';
 import { Header } from '../../components/Header';
 import { ColumnBlockRefactor } from '../../components/ColumnBlock';
 import { TaskBlock } from '../../components/TaskBlock';
-import { getTasks, setDndUpdate } from '../../redux/taskSlice';
+import { dndChange, getTasks, setDndUpdate } from '../../redux/taskSlice';
 
 export const PersonalDashboard = () => {
   const { statuses, tasks, filteredTasks } = useSelector((state) => state.tasks);
@@ -37,27 +37,30 @@ export const PersonalDashboard = () => {
 
     const activeItem = tasks.find((item) => item.id === active.id);
     const overItem = tasks.find((item) => item.id === over.id);
-
     const isSameColumn = activeItem.status === overItem.status;
-
     let newItems = [...tasks];
+    const activeIndex = tasks.findIndex((item) => item.id === active.id);
+    const overIndex = tasks.findIndex((item) => item.id === over.id);
 
-    const oldIndex = tasks.findIndex((item) => item.id === active.id);
-    const newIndex = tasks.findIndex((item) => item.id === over.id);
+    if (activeIndex === overIndex) return;
 
     if (isSameColumn) {
-      // if (active.id !== over.id && !over.id.startsWith('empty-')) {
-      newItems = arrayMove(tasks, oldIndex, newIndex);
+      newItems = arrayMove(tasks, activeIndex, overIndex);
 
-      newItems = newItems.map((item, index) => ({
-        ...item,
-        order_index: item.status === activeItem.status ? index : item.order_index,
-      }));
+      newItems = newItems.map((item, index) => {
+        return {
+          ...item,
+          order_index: item.status === activeItem.status ? index : item.order_index,
+        };
+      });
     } else {
-      newItems = arrayMove(tasks, oldIndex, newIndex);
+      // if (activeIndex < overIndex) {
+      //   newItems = arrayMove(tasks, activeIndex, overIndex);
+      // }
+      newItems = arrayMove(tasks, activeIndex, overIndex);
 
-      newItems[newIndex] = {
-        ...newItems[newIndex],
+      newItems[overIndex] = {
+        ...newItems[overIndex],
         status: overItem.status,
         order_index: overItem.order_index,
       };
@@ -75,23 +78,22 @@ export const PersonalDashboard = () => {
         }
         return item;
       });
-      // }
     }
+
     dispatch(setDndUpdate(newItems));
   };
 
   const onDragEnd = (event) => {
+    const { active, over } = event;
+    // console.log('active', tasks[active.id]);
+    // console.log('over', tasks[over.id]);
+    console.log('TASK AFTER DND', tasks);
+    dispatch(dndChange(tasks));
     setActiveId(null);
     setOverId(null);
   };
 
   const activeItem = tasks.find((item) => item.id === activeId);
-
-  // statuses.forEach((status, id) => {
-  //   if (tasks.filter((task) => task.status === id).length === 0) {
-  //     tasks.push({  isPlaceholder: true, status: id, id: `empty-${id}` });
-  //   }
-  // });
 
   return (
     <>
@@ -110,7 +112,7 @@ export const PersonalDashboard = () => {
             {statuses.map((statusTitle, i) => (
               <ColumnBlockRefactor key={i} statusTitle={statusTitle}>
                 <SortableContext
-                  items={tasks.filter((task) => task.status === i)}
+                  items={tasks.filter((task) => task.status === i).map((task) => task.id)}
                   strategy={verticalListSortingStrategy}>
                   <div className={styles.tasksList}>
                     {tasks

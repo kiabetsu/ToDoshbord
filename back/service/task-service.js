@@ -17,7 +17,6 @@ class TaskService {
       ]);
       let picture = {};
 
-      console.log('check', pictureQuery.rows.length != 0);
       if (pictureQuery.rows.length != 0) {
         picture = {
           ...pictureQuery.rows[0],
@@ -45,13 +44,10 @@ class TaskService {
       });
     }
 
-    // console.log('RESULT', result);
-
     return result;
   }
 
   async getFile(filePath, filename) {
-    console.log(filePath, filename);
     const fileRout = path.join(__dirname, '..', 'files', filePath, filename);
     try {
       const data = await fs.promises.readFile(fileRout);
@@ -77,7 +73,6 @@ class TaskService {
         [newTask.rows[0].id, image.originalname, `/taskPictures/${image.savedName}`],
       );
     }
-    console.log(attachments);
     if (attachments.length > 0) {
       for (const attach of attachments) {
         const attachmentInsert = await db.query(
@@ -200,21 +195,15 @@ class TaskService {
     return deletedTask.rows[0];
   }
 
-  async dndChange(changeData) {
-    const tasks_id = Object.keys(changeData);
-    for (let id of tasks_id) {
-      const orderIndex = changeData[id].order_index;
-      const status = changeData[id].status;
+  async dndChange(positionList) {
+    for (let position of positionList) {
       await db.query('UPDATE tasks SET status = $1, order_index = $2 WHERE id = $3 ', [
-        status,
-        orderIndex,
-        id,
+        position.status,
+        position.orderIndex,
+        position.id,
       ]);
     }
   }
 }
-
-console.log('dirname', path.join(__dirname, '../asset'));
-console.log('check', fs.existsSync(path.join(__dirname, '../asset')));
 
 module.exports = new TaskService();

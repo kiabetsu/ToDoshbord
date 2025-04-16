@@ -61,7 +61,6 @@ export const authSlice = createSlice({
       state.isAuth = false;
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      console.log('sosite23');
     },
   },
   extraReducers: (builder) => {
