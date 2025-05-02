@@ -16,10 +16,10 @@ import { TaskModal } from '../../components/TaskModal';
 import { Header } from '../../components/Header';
 import { ColumnBlockRefactor } from '../../components/ColumnBlock';
 import { TaskBlock } from '../../components/TaskBlock';
-import { dndChange, getTasks, setDndUpdate } from '../../redux/taskSlice';
+import { dndChange, setDndUpdate, addAlert } from '../../redux/taskSlice';
 
 export const PersonalDashboard = () => {
-  const { statuses, tasks, filteredTasks } = useSelector((state) => state.tasks);
+  const { statuses, tasks } = useSelector((state) => state.tasks);
   const dispatch = useDispatch();
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 10 } }));
@@ -84,10 +84,6 @@ export const PersonalDashboard = () => {
   };
 
   const onDragEnd = (event) => {
-    const { active, over } = event;
-    // console.log('active', tasks[active.id]);
-    // console.log('over', tasks[over.id]);
-    console.log('TASK AFTER DND', tasks);
     dispatch(dndChange(tasks));
     setActiveId(null);
     setOverId(null);
@@ -100,7 +96,8 @@ export const PersonalDashboard = () => {
       <TaskModal />
       <Header />
       <div className={styles.main}>
-        <button onClick={() => dispatch(getTasks())}>check rerenders</button>
+        {/* <button onClick={() => dispatch(getTasks())}>check rerenders</button> */}
+        <button onClick={() => dispatch(addAlert())}> add alert</button>
         <h2>Road map</h2>
         <DndContext
           collisionDetection={closestCenter}

@@ -1,6 +1,7 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+import { login, registration, logout } from './authSlice';
 import { data } from '../asset/data.js';
 import { setAuth } from './authSlice.js';
 
@@ -31,6 +32,7 @@ export const formatDate = (date) => {
 };
 
 const initialState = {
+  alertList: [{}],
   tasks: [],
   statuses: ['To Do', 'In Progress', 'Done'],
   modal: { isOpen: false, id: null, isCreating: false },
@@ -173,49 +175,6 @@ export const taskSlice = createSlice({
       state.confirm.event = action.payload.event;
     },
 
-    setLogin(state, action) {
-      state.login.isOpen = action.payload.isOpen;
-      state.login.tab = action.payload.tab;
-    },
-
-    setData: (state, action) => {
-      const indexOfElement = state.tasks.indexOf(
-        state.tasks.find((task) => task.id === action.payload.id),
-      );
-      if (state.tasks[indexOfElement].image !== action.payload.pic) {
-        state.tasks[indexOfElement].image = action.payload.pic;
-      }
-      if (state.tasks[indexOfElement].summary !== action.payload.summary) {
-        state.tasks[indexOfElement].summary = action.payload.summary;
-      }
-      if (state.tasks[indexOfElement].description !== action.payload.description) {
-        state.tasks[indexOfElement].description = action.payload.description;
-      }
-      if (state.tasks[indexOfElement].due_date.date !== action.payload.due_date) {
-        state.tasks[indexOfElement].due_date = formatDate(action.payload.due_date);
-      }
-      if (state.tasks[indexOfElement].attachments !== action.payload.attachments) {
-        state.tasks[indexOfElement].attachments = action.payload.attachments;
-      }
-    },
-
-    // createTask: (state, action) => {
-    //   const newTask = {};
-    //   newTask['id'] = state.tasks[state.tasks.length - 1].id + 1;
-    //   newTask['status'] = 0;
-    //   newTask['image'] = action.payload.pic;
-    //   newTask['summary'] = action.payload.summary;
-    //   newTask['description'] = action.payload.description;
-    //   newTask['due_date'] = formatDate(action.payload.due_date);
-    //   newTask['attachments'] = action.payload.attachments;
-
-    //   state.tasks.push(newTask);
-    // },
-
-    setRemoveTask: (state, action) => {
-      state.tasks = state.tasks.filter((task) => task.id !== action.payload.id);
-    },
-
     setTasksFilter: (state, action) => {
       state.filteredTasks = state.tasks.filter(
         (task) =>
@@ -224,20 +183,15 @@ export const taskSlice = createSlice({
       );
     },
 
-    setDataTextContent: (state, action) => {
-      const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
-      // state.TESTOUTPUT = id;
-
-      state.tasks[id][action.payload.key] = action.payload.value;
-    },
-
-    setStatus: (state, action) => {
-      const id = state.tasks.indexOf(state.tasks.find((task) => task.id === action.payload.id));
-      state.tasks[id].status = action.payload.status;
-    },
-
     setDndUpdate: (state, action) => {
       state.tasks = action.payload;
+    },
+
+    addAlert: (state) => {
+      console.log('zashel v addAlert');
+      const alertListLength = state.alertList.length;
+      state.alertList[alertListLength - 1] = { status: 'error', massage: 'hello world' };
+      state.alertList.push({});
     },
   },
 
@@ -318,25 +272,57 @@ export const taskSlice = createSlice({
     builder.addCase(dndChange.rejected, (state) => {
       state.requestStatus = 'error';
     });
+
+    builder.addCase(login.rejected, (state, action) => {
+      console.log(action);
+      const alertListLength = state.alertList.length;
+      state.alertList[alertListLength - 1] = { status: 'error', massage: action.error.message };
+      state.alertList.push({});
+    });
+
+    builder.addCase(login.fulfilled, (state, action) => {
+      console.log('success login action', action);
+      const alertListLength = state.alertList.length;
+      state.alertList[alertListLength - 1] = { status: 'success', massage: 'Login was successful' };
+      state.alertList.push({});
+    });
+
+    builder.addCase(registration.rejected, (state, action) => {
+      console.log(action);
+      const alertListLength = state.alertList.length;
+      state.alertList[alertListLength - 1] = { status: 'error', massage: action.error.message };
+      state.alertList.push({});
+    });
+
+    builder.addCase(registration.fulfilled, (state, action) => {
+      console.log('success login action', action);
+      const alertListLength = state.alertList.length;
+      state.alertList[alertListLength - 1] = {
+        status: 'success',
+        massage: 'Registration was successful',
+      };
+      state.alertList.push({});
+    });
+
+    builder.addCase(logout.rejected, (state, action) => {
+      console.log(action);
+      const alertListLength = state.alertList.length;
+      state.alertList[alertListLength - 1] = { status: 'error', massage: action.error.message };
+      state.alertList.push({});
+    });
+
+    builder.addCase(logout.fulfilled, (state, action) => {
+      console.log('success login action', action);
+      const alertListLength = state.alertList.length;
+      state.alertList[alertListLength - 1] = {
+        status: 'success',
+        massage: 'Logout was successful',
+      };
+      state.alertList.push({});
+    });
   },
 });
 
-export const {
-  setModal,
-  setConfirm,
-  setLogin,
-  setData,
-  setDueDate,
-  setDataTextContent,
-  setStatus,
-  setIdDraggingComponent,
-  setOrderIndex,
-  setUploadAttachment,
-  setRemoveAttachment,
-  // createTask,
-  setRemoveTask,
-  setTasksFilter,
-  setDndUpdate,
-} = taskSlice.actions;
+export const { setModal, setConfirm, setTasksFilter, setDndUpdate, addAlert } = taskSlice.actions;
 
 export default taskSlice.reducer;

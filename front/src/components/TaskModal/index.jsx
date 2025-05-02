@@ -18,16 +18,7 @@ import { ConfirmModal } from '../ConfirmModal';
 import { ImgUpload, DropFileInput } from '../DropFileInput';
 import styles from './styles.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  setModal,
-  setData,
-  createTask,
-  setConfirm,
-  addTask,
-  getTasks,
-  updateTask,
-  deleteTask,
-} from '../../redux/taskSlice';
+import { setModal, setConfirm, addTask, updateTask } from '../../redux/taskSlice';
 
 import { TaskModalField } from '../TaskModalField';
 

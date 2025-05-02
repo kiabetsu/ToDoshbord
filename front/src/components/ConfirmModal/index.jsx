@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import styles from './styles.module.scss';
 import { ModalRefactored } from '../Modal';
-import { deleteTask, setConfirm, setModal, setRemoveTask } from '../../redux/taskSlice';
+import { deleteTask, setConfirm, setModal } from '../../redux/taskSlice';
 
 export const ConfirmModal = ({ id }) => {
   const { confirm } = useSelector((state) => state.tasks);

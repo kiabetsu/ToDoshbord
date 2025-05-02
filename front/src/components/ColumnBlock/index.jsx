@@ -1,21 +1,11 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { SortableContext } from '@dnd-kit/sortable';
+import { useSelector } from 'react-redux';
 
 import styles from './style.module.scss';
 import { TaskBlock } from '../TaskBlock';
-import { setStatus } from '../../redux/taskSlice';
 
 export const ColumnBlock = ({ title, status }) => {
   const tasks = useSelector((state) => state.tasks.tasks.filter((obj) => obj.status === status));
-  const { idDraggingComponent } = useSelector((state) => state.tasks);
-
-  const dispatch = useDispatch();
-
-  const changeStatus = (id, status) => {
-    const data = { id: id, status: status };
-    dispatch(setStatus(data));
-  };
 
   return (
     <div className={styles.column} style={{}}>
@@ -37,7 +27,7 @@ export const ColumnBlockRefactor = ({ statusTitle, children }) => {
       <div className={styles.columnTitle}>
         <h2>{statusTitle}</h2>
       </div>
-      {children}
+      <div className={styles.tasksContainer}>{children}</div>
     </div>
   );
 };

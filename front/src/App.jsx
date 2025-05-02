@@ -6,7 +6,7 @@ import { PersonalDashboard } from './Pages/PersonalDashboard';
 import React from 'react';
 import { checkAuth } from './redux/authSlice';
 import { getTasks } from './redux/taskSlice';
-import { Alert } from './components/Alert';
+import { Alert, AlertList } from './components/Alert';
 
 function App() {
   const { isLoading, isAuth } = useSelector((state) => state.auth);
@@ -19,7 +19,7 @@ function App() {
 
   return (
     <div className="App">
-      {/* <Alert /> */}
+      <AlertList />
       <LoginModal />
       <PersonalDashboard />
     </div>

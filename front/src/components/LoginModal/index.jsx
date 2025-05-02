@@ -36,11 +36,17 @@ export const LoginModal = (props) => {
   };
 
   const clearLoginState = () => {
+    setUsername('');
+    setPassword('');
     usernameRef.current.value = '';
     passwordRef.current.value = '';
   };
 
   const clearRegState = () => {
+    setReg_username('');
+    setReg_email('');
+    setReg_password('');
+    setReg_passwordConfirm('');
     regUsernameRef.current.value = '';
     regEmailRef.current.value = '';
     regPasswordRef.current.value = '';

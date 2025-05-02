@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 // import { AuthService } from '../service/AuthService';
 import axios from 'axios';
+import { addAlert, addLoginErrorAlert } from './taskSlice';
 
 const initialState = {
   user: {},
@@ -22,7 +23,7 @@ export const registration = createAsyncThunk(
       });
       return res.data;
     } catch (error) {
-      throw new Error('error per registration');
+      throw new Error('Error per registration');
     }
   },
 );
@@ -32,7 +33,7 @@ export const login = createAsyncThunk('auth/login', async ({ username, password 
     const res = await axios.post(URL + 'login', { username, password }, { withCredentials: true });
     return res.data;
   } catch (error) {
-    throw new Error('error per login');
+    throw new Error('Error per login');
   }
 });
 
@@ -76,7 +77,8 @@ export const authSlice = createSlice({
       state.user = action.payload.user;
     });
 
-    builder.addCase(login.rejected, (state) => {
+    builder.addCase(login.rejected, (state, action) => {
+      console.log('zashel');
       state.status = 'error';
     });
 

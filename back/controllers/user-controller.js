@@ -5,6 +5,8 @@ class userController {
   async registration(req, res, next) {
     try {
       const { username, password, email } = req.body;
+      if (!username && !password && !email)
+        throw ApiErrors.BadRequest('Были присланы некорректные данные');
       const newUser = await userService.registration(username, password, email);
       res.cookie('refreshToken', newUser.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
