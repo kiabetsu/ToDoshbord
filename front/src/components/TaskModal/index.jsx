@@ -18,7 +18,7 @@ import { ConfirmModal } from '../ConfirmModal';
 import { ImgUpload, DropFileInput } from '../DropFileInput';
 import styles from './styles.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import { setModal, setConfirm, addTask, updateTask } from '../../redux/taskSlice';
+import { setModal, setConfirm, addTask, updateTask, addAlert } from '../../redux/taskSlice';
 
 import { TaskModalField } from '../TaskModalField';
 
@@ -41,7 +41,8 @@ export const TaskModal = () => {
   const [editedSummary, setEditedSummary] = React.useState(data ? data.summary : '');
   const [editedDescription, setEditedDescription] = React.useState(data ? data.description : '');
   const [editedDueDate, setEditedDueDate] = React.useState(data ? data.due_date.date : '');
-  const [editedAttachments, setEditedAttachments] = React.useState(data ? data.attachments : []);
+  const [oldAttachments, setOldAttachments] = React.useState(data ? data.attachments : []);
+  const [newAttachments, setNewAttachments] = React.useState([]);
   const [isRequiredFiled, setRequiredField] = React.useState(false);
 
   React.useEffect(() => {
@@ -50,7 +51,7 @@ export const TaskModal = () => {
       setEditedSummary(data ? data.summary : '');
       setEditedDescription(data ? data.description : '');
       setEditedDueDate(data ? data.due_date.date : currentDate);
-      setEditedAttachments(data ? data.attachments : []);
+      setOldAttachments(data ? data.attachments : []);
       setLoaded(true);
     }
   }, [modal]);
@@ -65,7 +66,7 @@ export const TaskModal = () => {
         editedSummary !== data.summary ||
         editedDescription !== data.description ||
         editedDueDate !== data.due_date.date ||
-        editedAttachments !== data.attachments ||
+        oldAttachments !== data.attachments ||
         event === 'remove') &&
       !modal.isCreating
     ) {
@@ -94,20 +95,22 @@ export const TaskModal = () => {
     };
   });
 
-  const onCreateTask = (summary, description, due_date, attachments, pic) => {
+  const onCreateTask = (summary, description, due_date, oldAttachments, newAttachments, pic) => {
     dispatch(
       addTask({
         summary: summary,
         description: description,
         due_date: due_date,
-        attachments: attachments,
+        oldAttachments: oldAttachments,
+        newAttachments: newAttachments,
         image: pic,
       }),
     );
     dispatch(setModal({ isOpen: false, id: null, isCreating: false }));
+    setNewAttachments([]);
   };
 
-  const onConfirm = (id, summary, description, due_date, attachments, pic) => {
+  const onConfirm = (id, summary, description, due_date, oldAttachments, newAttachments, pic) => {
     if (summary) {
       dispatch(
         updateTask({
@@ -115,15 +118,19 @@ export const TaskModal = () => {
           summary: summary,
           description: description,
           due_date: due_date,
-          attachments: attachments,
+          oldAttachments: oldAttachments,
+          newAttachments: newAttachments,
           image: pic,
         }),
       );
       dispatch(setModal({ isOpen: false, id: null, isCreating: false }));
       setLoaded(false);
+      dispatch(addAlert({ status: 'success', message: 'The task was update success' }));
     } else {
       setRequiredField(true);
+      dispatch(addAlert({ status: 'error', message: 'Enter summary' }));
     }
+    setNewAttachments([]);
   };
 
   const onRemoveTask = (e, id) => {
@@ -135,7 +142,14 @@ export const TaskModal = () => {
     <button
       className={styles.createButton}
       onClick={() =>
-        onCreateTask(editedSummary, editedDescription, editedDueDate, editedAttachments, editedPic)
+        onCreateTask(
+          editedSummary,
+          editedDescription,
+          editedDueDate,
+          oldAttachments,
+          newAttachments,
+          editedPic,
+        )
       }>
       <Plus size={20} />
       &nbsp;Create
@@ -150,7 +164,8 @@ export const TaskModal = () => {
             editedSummary,
             editedDescription,
             editedDueDate,
-            editedAttachments,
+            oldAttachments,
+            newAttachments,
             editedPic,
           )
         }>
@@ -207,7 +222,12 @@ export const TaskModal = () => {
             />
           </TaskModalField>
           <TaskModalField icon={<Paperclip />} name="Attachments">
-            <DropFileInput fileList={editedAttachments} setFileList={setEditedAttachments} />
+            <DropFileInput
+              fileList={oldAttachments}
+              setFileList={setOldAttachments}
+              newFiles={newAttachments}
+              setNewFiles={setNewAttachments}
+            />
           </TaskModalField>
         </div>
       </div>

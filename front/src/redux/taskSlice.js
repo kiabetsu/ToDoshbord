@@ -86,33 +86,34 @@ export const addTask = createAsyncThunk(
   },
 );
 
-export const updateTask = createAsyncThunk(
-  'task/update',
-  async (payload, { dispatch, rejectWithValue }) => {
-    const formatData = new FormData();
-    formatData.append('id', payload.id);
-    formatData.append('summary', payload.summary);
-    formatData.append('description', payload.description);
-    formatData.append('due_date', payload.due_date);
-    formatData.append('image', payload.image);
-    for (const file of payload.attachments) {
-      formatData.append('attachments', file);
-    }
-    try {
-      const res = await axios.put(API_URL + 'task/update', formatData, {
-        withCredentials: true,
-        headers: {
-          authorization: `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      return res.data;
-    } catch (error) {
-      // dispatch(setAuth());
-      return rejectWithValue(error.response?.data);
-    }
-  },
-);
+export const updateTask = createAsyncThunk('task/update', async (payload, { rejectWithValue }) => {
+  const formatData = new FormData();
+  formatData.append('id', payload.id);
+  formatData.append('summary', payload.summary);
+  formatData.append('description', payload.description);
+  formatData.append('due_date', payload.due_date);
+  formatData.append('image', payload.image);
+  console.log('oldAttachments', payload.oldAttachments);
+  console.log('newAttachments', payload.newAttachments);
+  payload.oldAttachments.forEach((file) => {
+    formatData.append('oldAttachments', JSON.stringify(file));
+  });
+  for (const newFile of payload.newAttachments) {
+    formatData.append('newAttachments', newFile);
+  }
+  try {
+    const res = await axios.put(API_URL + 'task/update', formatData, {
+      withCredentials: true,
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data;
+  } catch (error) {
+    return rejectWithValue(error.response?.data);
+  }
+});
 
 export const deleteTask = createAsyncThunk(
   'task/delete',
@@ -187,10 +188,13 @@ export const taskSlice = createSlice({
       state.tasks = action.payload;
     },
 
-    addAlert: (state) => {
+    addAlert: (state, action) => {
       console.log('zashel v addAlert');
       const alertListLength = state.alertList.length;
-      state.alertList[alertListLength - 1] = { status: 'error', massage: 'hello world' };
+      state.alertList[alertListLength - 1] = {
+        status: action.payload.status,
+        massage: action.payload.message,
+      };
       state.alertList.push({});
     },
   },

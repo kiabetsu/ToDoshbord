@@ -85,9 +85,12 @@ class TaskService {
     return newTask.rows[0];
   }
 
-  async updateTask(id, summary, description, due_date, image, attachments) {
+  async updateTask(id, summary, description, due_date, image, oldAttachments, newAttachments) {
+    console.log('___OLD ATTACHMENTS___', oldAttachments);
+    console.log('___NEW ATTACHMENTS___', newAttachments);
+
     if (!id) throw new Error('Id wasn`t sand');
-    const updatedTask = await db.query(
+    const updatingTask = await db.query(
       'UPDATE tasks SET summary = $1, description = $2, due_date = $3 WHERE id = $4 RETURNING *',
       [summary, description, due_date, id],
     );
@@ -120,31 +123,57 @@ class TaskService {
     }
 
     //update task attachments
-    const chooseOldAttachments = await db.query('SELECT * FROM attachments WHERE task_id = $1', [
-      id,
-    ]);
-    if (chooseOldAttachments.rows.length) {
-      for (const attachmentNote of chooseOldAttachments.rows) {
+    let existingFilesArray = [];
+    if (oldAttachments) {
+      if (Array.isArray(oldAttachments)) {
+        existingFilesArray = oldAttachments.map((file) => JSON.parse(file));
+      } else {
+        existingFilesArray = [JSON.parse(oldAttachments)];
+      }
+    }
+    if (existingFilesArray && existingFilesArray.length > 0) {
+      // Получаем массив ID вложений, которые нужно сохранить
+
+      const attachmentIdsToKeep = existingFilesArray.map((a) => a.attachment_id);
+
+      // 1. Находим и удаляем файлы, которые больше не нужны
+      const attachmentsToDelete = await db.query(
+        `SELECT * FROM attachments 
+         WHERE task_id = $1 
+         AND attachment_id NOT IN (${attachmentIdsToKeep.map((_, i) => `$${i + 2}`).join(',')})`,
+        [id, ...attachmentIdsToKeep],
+      );
+
+      for (const attachmentNote of attachmentsToDelete.rows) {
         const filePath = path.join(__dirname, '..', 'files', attachmentNote.file_path);
         try {
           await fs.promises.access(filePath);
-        } catch {
-          return res.status(404).json({ error: 'File not found' });
+          await fs.promises.unlink(filePath);
+        } catch (err) {
+          console.error('Error deleting file:', err);
         }
-        await fs.promises.unlink(filePath);
       }
+
+      // 2. Удаляем записи из БД
+      await db.query(
+        `DELETE FROM attachments 
+         WHERE task_id = $1 
+         AND attachment_id NOT IN (${attachmentIdsToKeep.map((_, i) => `$${i + 2}`).join(',')})`,
+        [id, ...attachmentIdsToKeep],
+      );
     }
 
-    const deleteOldAttachments = await db.query('DELETE FROM attachments WHERE task_id = $1', [id]);
-    if (attachments.length > 0) {
-      for (const attach of attachments) {
-        const attachmentInsert = await db.query(
+    // Добавляем новые вложения
+    if (newAttachments && newAttachments.length > 0) {
+      for (const attach of newAttachments) {
+        await db.query(
           'INSERT INTO attachments (task_id, file_name, file_path) VALUES ($1, $2, $3) RETURNING *',
           [id, attach.originalname, `/attachments/${attach.savedName}`],
         );
       }
     }
-    return updatedTask.rows[0];
+
+    return updatingTask.rows[0];
   }
 
   async deleteTask(id) {

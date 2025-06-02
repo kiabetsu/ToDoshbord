@@ -57,15 +57,15 @@ class taskController {
   async updateTask(req, res, next) {
     try {
       const user_id = req.user.id;
-      const { id, summary, description, due_date } = req.body;
+      const { id, summary, description, due_date, oldAttachments } = req.body;
       const image = req.files['image']
         ? {
             originalname: req.files['image'][0].originalname,
             savedName: req.files['image'][0].filename,
           }
         : null;
-      const attachments = req.files['attachments']
-        ? req.files['attachments'].map((file) => {
+      const newAttachments = req.files['newAttachments']
+        ? req.files['newAttachments'].map((file) => {
             return { originalname: file.originalname, savedName: file.filename };
           })
         : [];
@@ -75,7 +75,8 @@ class taskController {
         description,
         due_date,
         image,
-        attachments,
+        oldAttachments,
+        newAttachments,
       );
 
       const tasks = await TaskService.getTasks(user_id);

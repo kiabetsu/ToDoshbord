@@ -10,7 +10,7 @@ export const Alert = ({ status, massage, isLast }) => {
     if (!isLast) {
       setTimeout(() => {
         setDeleteAlert(true);
-      }, 100000);
+      }, 5000);
     }
   }, [isLast]);
   return (

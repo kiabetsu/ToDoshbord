@@ -3,7 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import styles from './style.module.scss';
 import { ArrowUpFromLine, X, ImagePlus } from 'lucide-react';
 import { formatDate } from '../../redux/taskSlice';
-export function DropFileInput({ fileList, setFileList }) {
+export function DropFileInput({ fileList, setFileList, newFiles, setNewFiles }) {
   const getDate = (date) => {
     return `${date.getDate(date)}.${date.getMonth(date) + 1}.${date.getFullYear(
       date,
@@ -14,23 +14,70 @@ export function DropFileInput({ fileList, setFileList }) {
     const newFile = acceptedFiles[0];
     const today = new Date();
     newFile['uploaded_at'] = today.toISOString();
-    newFile['attachment_id'] = fileList.length > 0 ? fileList.at(-1).attachment_id + 1 : 0;
+    newFile['attachment_id'] = newFiles.length > 0 ? newFiles.at(-1).attachment_id + 1 : 0;
+    newFile['file_name'] = newFile.name;
+    delete newFile.name;
     const file = new FileReader();
     file.readAsDataURL(acceptedFiles[0]);
     file.onload = function () {
+      console.log('upload file', newFile);
       newFile['url'] = file.result;
       if (newFile) {
-        const updatedList = [...fileList, newFile];
-        setFileList(updatedList);
+        const updatedList = [...newFiles, newFile];
+        console.log('full updateList', updatedList);
+        setNewFiles(updatedList);
+        console.log('newFILES after update', newFiles);
       }
     };
+
+    // const newFile = {};
+    // const today = new Date();
+    // newFile['path'] = acceptedFiles[0].path;
+    // newFile['uploaded_at'] = today.toISOString();
+    // newFile['attachment_id'] = fileList.length > 0 ? fileList.at(-1).attachment_id + 1 : 0;
+    // newFile['file_name'] = acceptedFiles[0].name;
+    // newFile['size'] = acceptedFiles[0].size;
+    // const file = new FileReader();
+    // file.readAsDataURL(acceptedFiles[0]);
+    // file.onload = function () {
+    //   console.log('upload file', newFile);
+    //   newFile['url'] = file.result;
+    //   if (newFile) {
+    //     const updatedList = [...fileList, newFile];
+    //     setFileList(updatedList);
+    //   }
+    // };
   });
 
-  const fileRemove = (item) => {
-    const updateList = fileList.filter((file) => {
-      return file.attachment_id !== item.attachment_id;
+  const fileRemove = (id, type) => {
+    const selectedList = type === 'old' ? fileList : newFiles;
+    const updateList = selectedList.filter((file) => {
+      return file.attachment_id !== id;
     });
-    setFileList(updateList);
+    type === 'old' ? setFileList(updateList) : setNewFiles(updateList);
+  };
+
+  const attachBlock = (item, index, type) => {
+    console.log('key value', `${index + type}`);
+    return (
+      <div key={`${index + type}`} className={styles.previewBlock}>
+        <img src={item.url} alt="" />
+        <div className={styles.previewInfo}>
+          <span className={styles.previewName}>{nameCat(item.file_name)}</span>
+          <span className={styles.MoreInfo}>
+            Upload at {formatDate(item.uploaded_at).date_format} •{/* {fileSize(item.size)} */}
+          </span>
+        </div>
+        <span
+          className={styles.previewDelete}
+          onClick={(e) => {
+            e.stopPropagation();
+            fileRemove(item.attachment_id, type);
+          }}>
+          <X size={24} />
+        </span>
+      </div>
+    );
   };
 
   const nameCat = (name) => {
@@ -65,7 +112,7 @@ export function DropFileInput({ fileList, setFileList }) {
 
   return (
     <>
-      {fileList.length > 0 ? (
+      {fileList.length + newFiles.length > 0 ? (
         <>
           <div className={styles.lime} {...getRootProps()}>
             <input {...getInputProps()} />
@@ -82,24 +129,28 @@ export function DropFileInput({ fileList, setFileList }) {
               ) : null}
               <span className={styles.previewTitle}>Files</span>
               {fileList.map((item, index) => (
-                <div key={index} className={styles.previewBlock}>
-                  <img src={item.url} alt="" />
-                  <div className={styles.previewInfo}>
-                    <span className={styles.previewName}>{nameCat(item.file_name)}</span>
-                    <span className={styles.MoreInfo}>
-                      Upload at {formatDate(item.uploaded_at).date_format} •
-                      {/* {fileSize(item.size)} */}
-                    </span>
-                  </div>
-                  <span
-                    className={styles.previewDelete}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      fileRemove(item);
-                    }}>
-                    <X size={24} />
-                  </span>
-                </div>
+                // <div key={index} className={styles.previewBlock}>
+                //   <img src={item.url} alt="" />
+                //   <div className={styles.previewInfo}>
+                //     <span className={styles.previewName}>{nameCat(item.file_name)}</span>
+                //     <span className={styles.MoreInfo}>
+                //       Upload at {formatDate(item.uploaded_at).date_format} •
+                //       {/* {fileSize(item.size)} */}
+                //     </span>
+                //   </div>
+                //   <span
+                //     className={styles.previewDelete}
+                //     onClick={(e) => {
+                //       e.stopPropagation();
+                //       fileRemove(item);
+                //     }}>
+                //     <X size={24} />
+                //   </span>
+                // </div>
+                <div>{attachBlock(item, index, 'old')}</div>
+              ))}
+              {newFiles.map((item, index) => (
+                <div>{attachBlock(item, index, 'new')}</div>
               ))}
             </div>
           </div>

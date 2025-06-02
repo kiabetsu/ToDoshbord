@@ -17,7 +17,7 @@ router.post(
   authMiddleware,
   upload.fields([
     { name: 'image', maxCount: 1 },
-    { name: 'attachments', maxCount: 5 },
+    { name: 'newAttachments', maxCount: 10 },
   ]),
   taskController.addTask,
 );
@@ -26,7 +26,7 @@ router.put(
   authMiddleware,
   upload.fields([
     { name: 'image', maxCount: 1 },
-    { name: 'attachments', maxCount: 5 },
+    { name: 'newAttachments', maxCount: 10 },
   ]),
   taskController.updateTask,
 );

@@ -96,8 +96,10 @@ export const PersonalDashboard = () => {
       <TaskModal />
       <Header />
       <div className={styles.main}>
-        {/* <button onClick={() => dispatch(getTasks())}>check rerenders</button> */}
-        <button onClick={() => dispatch(addAlert())}> add alert</button>
+        <button onClick={() => dispatch(addAlert({ message: 'test test test test' }))}>
+          {' '}
+          add alert
+        </button>
         <h2>Road map</h2>
         <DndContext
           collisionDetection={closestCenter}
