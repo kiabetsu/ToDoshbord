@@ -34,7 +34,12 @@ class taskController {
         : null;
       const attachments = req.files['attachments']
         ? req.files['attachments'].map((file) => {
-            return { originalname: file.originalname, savedName: file.filename };
+            return {
+              originalname: file.originalname,
+              savedName: file.filename,
+              type: file.mimetype,
+              size: file.size,
+            };
           })
         : [];
       const { summary, description, due_date } = req.body;
@@ -66,7 +71,13 @@ class taskController {
         : null;
       const newAttachments = req.files['newAttachments']
         ? req.files['newAttachments'].map((file) => {
-            return { originalname: file.originalname, savedName: file.filename };
+            console.log('file', file);
+            return {
+              originalname: file.originalname,
+              savedName: file.filename,
+              type: file.mimetype,
+              size: file.size,
+            };
           })
         : [];
       const task = await TaskService.updateTask(

@@ -16,8 +16,8 @@ router.post(
   '/task/add',
   authMiddleware,
   upload.fields([
-    { name: 'image', maxCount: 1 },
-    { name: 'newAttachments', maxCount: 10 },
+    { name: 'image', maxCount: 2 },
+    { name: 'attachments', maxCount: 10 },
   ]),
   taskController.addTask,
 );

@@ -88,10 +88,25 @@
     max-height: 100%;
     margin-right: 20px;
     border-radius: 4px;
+    position: relative;
   }
 
   &:not(:last-child) {
     margin-bottom: 10px;
+  }
+
+  .fileType {
+    font-weight: 600;
+    position: absolute;
+    transform: translate(-18%, 20%);
+    background-color: #e5566a;
+    // padding: 2px 10px;
+    width: 60px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
   }
 }
 

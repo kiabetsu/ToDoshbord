@@ -41,6 +41,7 @@ const initialState = {
   idDraggingComponent: false,
   filteredTasks: data,
   requestStatus: '',
+  newFiles: [],
 };
 
 export const getTasks = createAsyncThunk('task/get', async (_, { dispatch, rejectWithValue }) => {
@@ -61,16 +62,18 @@ export const getTasks = createAsyncThunk('task/get', async (_, { dispatch, rejec
 export const addTask = createAsyncThunk(
   'task/create',
   async (payload, { dispatch, rejectWithValue }) => {
+    console.log('enter to handler');
     const formatData = new FormData();
     formatData.append('summary', payload.summary);
     formatData.append('description', payload.description);
     formatData.append('due_date', payload.due_date);
     formatData.append('image', payload.image);
-    for (const file of payload.attachments) {
+    for (const file of payload.newAttachments) {
       formatData.append('attachments', file);
     }
 
     try {
+      console.log('send request fot create');
       const res = await axios.post(API_URL + 'task/add', formatData, {
         withCredentials: true,
         headers: {
@@ -168,6 +171,10 @@ export const taskSlice = createSlice({
       state.modal.isOpen = action.payload.isOpen;
       state.modal.id = action.payload.id;
       state.modal.isCreating = action.payload.isCreating;
+      if (action.payload.isOpen === false) {
+        state.newFiles = [];
+        console.log('CLEAR NEW FILES STATE');
+      }
     },
 
     setConfirm: (state, action) => {
@@ -196,6 +203,15 @@ export const taskSlice = createSlice({
         massage: action.payload.message,
       };
       state.alertList.push({});
+    },
+
+    AddNewFiles: (state, action) => {
+      state.newFiles = action.payload.newFiles;
+      console.log('newFiles state', state.newFiles);
+    },
+
+    clearAddedFiles: (state) => {
+      state.newFiles = [];
     },
   },
 
@@ -327,6 +343,14 @@ export const taskSlice = createSlice({
   },
 });
 
-export const { setModal, setConfirm, setTasksFilter, setDndUpdate, addAlert } = taskSlice.actions;
+export const {
+  setModal,
+  setConfirm,
+  setTasksFilter,
+  setDndUpdate,
+  addAlert,
+  AddNewFiles,
+  clearAddedFiles,
+} = taskSlice.actions;
 
 export default taskSlice.reducer;

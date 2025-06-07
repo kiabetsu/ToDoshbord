@@ -13,6 +13,7 @@ const storage = multer.diskStorage({
     console.log('MIDDLEWARE: ', 'Middleware started', file);
     if (file.fieldname === 'image') cb(null, path.join(uploadDir, '/taskPictures'));
     if (file.fieldname === 'newAttachments') cb(null, path.join(uploadDir, '/attachments'));
+    if (file.fieldname === 'attachments') cb(null, path.join(uploadDir, '/attachments'));
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);

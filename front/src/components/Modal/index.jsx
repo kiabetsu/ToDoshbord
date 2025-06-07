@@ -29,7 +29,7 @@ export const ModalRefactored = ({ modalType, children }) => {
           opacity: `${toggle ? 1 : 0}`,
           pointerEvents: `${toggle ? 'all' : 'none'}`,
           zIndex: `${modalType === 'confirm' ? 11 : 0}`,
-          top: `${modalType === 'confirm' ? '134%' : '50%'}`,
+          top: `${modalType === 'confirm' ? '121%' : '50%'}`,
         }}
       />
       <div

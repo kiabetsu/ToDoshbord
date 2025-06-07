@@ -75,9 +75,16 @@ class TaskService {
     }
     if (attachments.length > 0) {
       for (const attach of attachments) {
+        console.log(attach);
         const attachmentInsert = await db.query(
-          'INSERT INTO attachments (task_id, file_name, file_path) VALUES ($1, $2, $3) RETURNING *',
-          [newTask.rows[0].id, attach.originalname, `/attachments/${attach.savedName}`],
+          'INSERT INTO attachments (task_id, file_name, file_path, type, size) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+          [
+            newTask.rows[0].id,
+            attach.originalname,
+            `/attachments/${attach.savedName}`,
+            attach.type,
+            attach.size,
+          ],
         );
       }
     }
@@ -104,12 +111,7 @@ class TaskService {
       if (chooseOldImage.rows.length) {
         const filePath = path.join(__dirname, '..', 'files', chooseOldImage.rows[0].file_path);
 
-        try {
-          await fs.promises.access(filePath);
-        } catch {
-          throw new Error('File not found');
-        }
-        await fs.promises.unlink(filePath);
+        if (await fs.promises.access(filePath)) await fs.promises.unlink(filePath);
       }
 
       const deleteOldImage = await db.query(
@@ -132,11 +134,8 @@ class TaskService {
       }
     }
     if (existingFilesArray && existingFilesArray.length > 0) {
-      // Получаем массив ID вложений, которые нужно сохранить
-
       const attachmentIdsToKeep = existingFilesArray.map((a) => a.attachment_id);
 
-      // 1. Находим и удаляем файлы, которые больше не нужны
       const attachmentsToDelete = await db.query(
         `SELECT * FROM attachments 
          WHERE task_id = $1 
@@ -154,7 +153,6 @@ class TaskService {
         }
       }
 
-      // 2. Удаляем записи из БД
       await db.query(
         `DELETE FROM attachments 
          WHERE task_id = $1 
@@ -167,8 +165,8 @@ class TaskService {
     if (newAttachments && newAttachments.length > 0) {
       for (const attach of newAttachments) {
         await db.query(
-          'INSERT INTO attachments (task_id, file_name, file_path) VALUES ($1, $2, $3) RETURNING *',
-          [id, attach.originalname, `/attachments/${attach.savedName}`],
+          'INSERT INTO attachments (task_id, file_name, file_path, type, size) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+          [id, attach.originalname, `/attachments/${attach.savedName}`, attach.type, attach.size],
         );
       }
     }

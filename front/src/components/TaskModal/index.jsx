@@ -8,6 +8,7 @@ import {
   CalendarDays,
   AlignLeft,
   X,
+  ArrowDown,
 } from 'lucide-react';
 import TextareaAutosize from 'react-textarea-autosize';
 import 'react-date-picker/dist/DatePicker.css';
@@ -23,7 +24,7 @@ import { setModal, setConfirm, addTask, updateTask, addAlert } from '../../redux
 import { TaskModalField } from '../TaskModalField';
 
 export const TaskModal = () => {
-  const { modal, tasks, confirm } = useSelector((state) => state.tasks);
+  const { modal, tasks, confirm, newFiles } = useSelector((state) => state.tasks);
   const dispatch = useDispatch();
 
   const data = modal.id !== null && modal.isOpen && tasks.find((task) => task.id === modal.id);
@@ -67,12 +68,14 @@ export const TaskModal = () => {
         editedDescription !== data.description ||
         editedDueDate !== data.due_date.date ||
         oldAttachments !== data.attachments ||
+        newFiles != [] ||
         event === 'remove') &&
       !modal.isCreating
     ) {
       openConfirm(event);
     } else {
       dispatch(setModal({ isOpen: false, id: null, isCreating: false }));
+      setNewAttachments([]);
     }
     setLoaded(false);
   };
@@ -80,6 +83,10 @@ export const TaskModal = () => {
   const openConfirm = (event) => {
     dispatch(setConfirm({ isOpen: true, event: event }));
   };
+
+  React.useEffect(() => {
+    if (modal.isOpen === false) setNewAttachments([]);
+  }, [modal]);
 
   React.useEffect(() => {
     const handleClick = (e) => {
@@ -94,6 +101,30 @@ export const TaskModal = () => {
       document.removeEventListener('click', handleClick);
     };
   });
+
+  const contentRef = React.useRef(null);
+  const [hightContent, setHightContent] = React.useState(0);
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      if (contentRef.current) {
+        // console.dir(contentRef.current);
+        // console.log('scrollHight', contentRef.current.scrollHeight);
+        // console.log('offset', contentRef.current.offsetHeight);
+        // console.log('clientHight', contentRef.current.clientHeight);
+        setHightContent(contentRef.current.scrollHeight - contentRef.current.clientHeight);
+        // console.log('Максимальный скролл:', maxScroll);
+      }
+    }, 100);
+  }, [modal, newAttachments, oldAttachments]);
+
+  const [scroll, setScroll] = React.useState(0);
+
+  const handleScroll = (event) => {
+    setScroll(event.target.scrollTop);
+    // console.log('scroll', scroll);
+    // console.log('hight', hightContent);
+  };
 
   const onCreateTask = (summary, description, due_date, oldAttachments, newAttachments, pic) => {
     dispatch(
@@ -189,7 +220,7 @@ export const TaskModal = () => {
         <div className={styles.taskImg}>
           <ImgUpload image={editedPic} setImage={setEditedPic} />
         </div>
-        <div className={styles.content}>
+        <div ref={contentRef} className={styles.content} onScroll={handleScroll}>
           <TaskModalField icon={<Baseline />} name="Summary*" style={{ position: 'relative' }}>
             <div className={styles.buttonRow}>{buttonRow}</div>
             <input
@@ -229,6 +260,14 @@ export const TaskModal = () => {
               setNewFiles={setNewAttachments}
             />
           </TaskModalField>
+        </div>
+        <div
+          className={styles.scrollIndicatorContainer}
+          style={{
+            bottom: `${hightContent - scroll > 10 ? '-500px' : '-550px'}`,
+            opacity: `${hightContent - scroll > 10 ? '0.8' : '0'}`,
+          }}>
+          <ArrowDown className={styles.scrollIndicator} />
         </div>
       </div>
     </ModalRefactored>
