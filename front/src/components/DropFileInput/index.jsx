@@ -1,10 +1,17 @@
 import React from 'react';
 import { useDropzone } from 'react-dropzone';
 import styles from './style.module.scss';
-import { ArrowUpFromLine, X, ImagePlus } from 'lucide-react';
+import {
+  ArrowUpFromLine,
+  X,
+  ImagePlus,
+  ArrowDownToLine,
+  SquareArrowOutUpRight,
+} from 'lucide-react';
 import { AddNewFiles, formatDate } from '../../redux/taskSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import fileSVG from '../../asset/blank-file.svg';
+import saveAa, { saveAs } from 'file-saver';
 
 export function DropFileInput({ fileList, setFileList, newFiles, setNewFiles }) {
   const dispatch = useDispatch();
@@ -67,6 +74,15 @@ export function DropFileInput({ fileList, setFileList, newFiles, setNewFiles }) 
     type === 'old' ? setFileList(updateList) : dispatch(AddNewFiles({ newFiles: updateList }));
   };
 
+  const openInNewWindow = (item) => {
+    console.log('ITEM', item);
+    window.open(item.url, item.file_name);
+  };
+
+  const fileDownload = async (item) => {
+    saveAs(item.url, item.file_name);
+  };
+
   const attachBlock = (item, index, type) => {
     // console.log('key value', `${index + type}`);
     return (
@@ -91,6 +107,22 @@ export function DropFileInput({ fileList, setFileList, newFiles, setNewFiles }) 
             {item.size && fileSize(item.size)}
           </span>
         </div>
+        <span
+          className={styles.previewDownload}
+          onClick={(e) => {
+            e.stopPropagation();
+            fileDownload(item);
+          }}>
+          <ArrowDownToLine size={24} />
+        </span>{' '}
+        <span
+          className={styles.previewLink}
+          onClick={(e) => {
+            e.stopPropagation();
+            openInNewWindow(item);
+          }}>
+          <SquareArrowOutUpRight size={24} />
+        </span>{' '}
         <span
           className={styles.previewDelete}
           onClick={(e) => {

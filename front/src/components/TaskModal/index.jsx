@@ -68,7 +68,7 @@ export const TaskModal = () => {
         editedDescription !== data.description ||
         editedDueDate !== data.due_date.date ||
         oldAttachments !== data.attachments ||
-        newFiles != [] ||
+        newAttachments.length !== 0 ||
         event === 'remove') &&
       !modal.isCreating
     ) {
